@@ -47,3 +47,5 @@ Open your site -> Login with Discord -> design -> Publish -> `/card` in Discord.
 - Members must be in the server to publish (the card shows server ranks).
 - Role changes show within about 2 minutes.
 - Local test: `DEMO_MODE=1 SESSION_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx node dev-server.js`
+
+Deploy test.
