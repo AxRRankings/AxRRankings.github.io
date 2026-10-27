@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Battle Card</title>
+<meta name="theme-color" content="#060913">
+<link rel="stylesheet" href="/css/site.css">
+</head><body>
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/"><i></i><span>AxR <b>CARDS</b></span></a>
+  <a class="btn ghost" href="/editor" style="padding:6px 14px">Make yours</a>
+</div></header>
+<main class="wrap profile" id="app"><div class="loading">LOADING...</div></main>
+<div id="meta"></div>
+<script type="module">
+const id = location.pathname.split('/').pop().replace(/\.png$/, '');
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+try {
+  const r = await fetch('/api/profile/' + encodeURIComponent(id));
+  if (!r.ok) throw 0;
+  const p = await r.json();
+  const d = p.data, img = `/api/card/${encodeURIComponent(id)}.png?v=${p.publishedAt}`;
+  document.title = `${d.name} - Battle Card`;
+  const chips = Object.entries(d.tiers || {}).map(([m, t]) => `<span class="chip">${esc(m)}<b>${esc(t)}</b></span>`).join('');
+  app.innerHTML = `
+    <div><h1>${esc(d.name)}</h1><div class="meta">${esc(d.rank?.name || 'Unranked')} &middot; ${d.points} points</div></div>
+    <div class="stage"><img src="${img}" alt="Battle card of ${esc(d.name)}"></div>
+    <div class="chips">${chips || '<span class="meta">No tiers yet.</span>'}</div>
+    <div class="box">In Discord type <code>/card</code> for yours, or <code>/card @${esc(d.name)}</code> to show this one.</div>
+    <div><a class="btn" href="${img}" download="battlecard-${esc(id)}.png">Download PNG</a></div>`;
+} catch {
+  app.innerHTML = '<div class="box"><h2>No card published yet</h2><p class="meta">This player has not published a Battle Card.</p><a class="btn primary" href="/editor">Make yours</a></div>';
+}
+</script>
+</body></html>

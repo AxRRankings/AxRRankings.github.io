@@ -1,0 +1,15 @@
+$nomention
+$let[u;$authorID]
+$if[$message[1]!=]
+$let[u;$findUser[$message[1];yes]]
+$endif
+$httpGet[https://YOUR-SITE.vercel.app/api/status/$get[u]]
+$if[$httpResult[published]==true]
+$image[https://YOUR-SITE.vercel.app/api/card/$get[u].png?v=$getTimestamp]
+$else
+$if[$get[u]==$authorID]
+You have not published a Battle Card yet. Make one here: https://YOUR-SITE.vercel.app/editor
+$else
+<@$get[u]> has not published a Battle Card yet.
+$endif
+$endif

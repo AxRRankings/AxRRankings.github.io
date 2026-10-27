@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Battle Card Editor</title>
+<meta name="theme-color" content="#060913">
+<link rel="stylesheet" href="/css/site.css">
+</head><body>
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/"><i></i><span>AxR <b>CARDS</b></span></a>
+  <div class="userchip" id="chip"></div>
+</div></header>
+<main class="wrap">
+  <div id="banner"></div>
+  <div class="loading" id="loading">LOADING EDITOR...</div>
+  <div class="editor" id="editor" hidden>
+    <div class="preview-col">
+      <div class="preview-box">
+        <canvas id="cv"></canvas>
+        <div class="statusline"><span><i class="dot" id="dot"></i><span id="stat">Ready</span></span><span id="sizeinfo"></span></div>
+        <div class="actions-row">
+          <button class="btn primary" id="publish">Publish</button>
+          <button class="btn" id="copy">Copy link</button>
+          <button class="btn" id="dl">Download</button>
+          <a class="btn ghost" id="view" href="#" target="_blank" hidden>My page</a>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="tabs" id="tabs"></div>
+      <div id="panes"></div>
+    </div>
+  </div>
+</main>
+<script type="module" src="/js/editor.js"></script>
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "name": "axr-battlecards",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Battle Card creator for the AxR Rankings Minecraft PvP Discord server",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "test:render": "node scripts/test-render.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.100"
+  }
+}
