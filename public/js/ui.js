@@ -19,6 +19,7 @@ export const ICONS = {
   lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   send: '<path d="m22 2-7 20-4-9-9-4 20-7z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
 };
 export const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
@@ -26,7 +27,7 @@ export const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true
 export function navHTML({ links = true, right = '' } = {}) {
   return `<header class="nav"><div class="wrap">
     <a class="logo" href="/"><i><svg viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></i>AxR<b>CARDS</b></a>
-    ${links ? `<nav class="nav-links"><a href="/#features">Features</a><a href="/#gallery">Gallery</a><a href="/#how">How it works</a><a href="/#faq">FAQ</a></nav>` : ''}
+    ${links ? `<nav class="nav-links"><a href="/rankings">Rankings</a><a href="/#features">Features</a><a href="/#gallery">Gallery</a><a href="/#how">How it works</a><a href="/#faq">FAQ</a></nav>` : ''}
     <div class="nav-right" id="navright">${right}</div>
   </div></header>`;
 }

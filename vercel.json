@@ -1,13 +1,38 @@
 {
   "functions": {
-    "api/**/*.js": { "maxDuration": 15, "memory": 1024, "includeFiles": "public/**" }
+    "api/**/*.js": {
+      "maxDuration": 15,
+      "memory": 1024,
+      "includeFiles": "public/**"
+    }
   },
   "rewrites": [
-    { "source": "/editor", "destination": "/editor.html" },
-    { "source": "/u/:id", "destination": "/profile.html" },
-    { "source": "/card/:id", "destination": "/api/card/:id" }
+    {
+      "source": "/rankings",
+      "destination": "/rankings.html"
+    },
+    {
+      "source": "/editor",
+      "destination": "/editor.html"
+    },
+    {
+      "source": "/u/:id",
+      "destination": "/profile.html"
+    },
+    {
+      "source": "/card/:id",
+      "destination": "/api/card/:id"
+    }
   ],
   "headers": [
-    { "source": "/fonts/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ]
 }

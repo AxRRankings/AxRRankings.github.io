@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rankings - AxR Battle Cards</title>
+<meta name="description" content="AxR Rankings leaderboard. Click any player to see their Battle Card.">
+<meta name="theme-color" content="#05070d">
+<link rel="stylesheet" href="/css/site.css">
+</head><body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="rk-head">
+    <div><h1>Rankings</h1><p id="count">Click any player to open their Battle Card.</p></div>
+    <label class="rk-search"><span id="sic"></span><input id="q" type="search" placeholder="Search player" autocomplete="off"></label>
+  </div>
+  <div class="rk-tabs" id="tabs"></div>
+  <div class="rk-list" id="list"><div class="loading">Loading rankings</div></div>
+</main>
+<div id="modal" class="modal" hidden></div>
+<footer class="foot"><div class="wrap"><span>AxR RANKINGS</span><span>Not affiliated with Mojang or Discord.</span></div></footer>
+
+<script type="module">
+import { navHTML, fillNavUser, icon, esc } from '/js/ui.js';
+import { MODES, TIER_COLORS } from '/js/card-core.js';
+document.getElementById('nav').innerHTML = navHTML();
+document.getElementById('sic').innerHTML = icon('search');
+fillNavUser();
+
+const tabs = document.getElementById('tabs'), list = document.getElementById('list'), q = document.getElementById('q'), modal = document.getElementById('modal');
+let mode = 'ALL', players = [], total = 0, seq = 0;
+
+tabs.innerHTML = [['ALL', 'Overall'], ...MODES.map((m) => [m.key, m.label])].map(([k, l]) => `<button class="rk-tab ${k === 'ALL' ? 'on' : ''}" data-m="${k}">${l}</button>`).join('');
+tabs.addEventListener('click', (e) => {
+  const b = e.target.closest('.rk-tab'); if (!b) return;
+  tabs.querySelectorAll('.rk-tab').forEach((x) => x.classList.toggle('on', x === b));
+  mode = b.dataset.m; load();
+});
+q.addEventListener('input', draw);
+
+async function load() {
+  const my = ++seq; list.innerHTML = '<div class="loading">Loading rankings</div>';
+  try {
+    const r = await fetch('/api/rankings?mode=' + mode); if (!r.ok) throw 0;
+    const j = await r.json(); if (my !== seq) return;
+    players = j.players; total = j.total; draw();
+  } catch { list.innerHTML = '<div class="rk-empty">Could not load the rankings right now. Try again in a minute.</div>'; }
+}
+
+function chip(m, t) { return `<span class="rk-t ${t ? '' : 'none'}"><small>${m.label}</small><b style="${t ? 'color:' + (TIER_COLORS[t] || '#fff') : ''}">${t || '-'}</b></span>`; }
+function draw() {
+  const term = q.value.trim().toLowerCase();
+  const rows = term ? players.filter((p) => p.name.toLowerCase().includes(term)) : players;
+  document.getElementById('count').textContent = `${total} ranked player${total === 1 ? '' : 's'}. Click any player to open their Battle Card.`;
+  if (!rows.length) { list.innerHTML = '<div class="rk-empty">No players found.</div>'; return; }
+  list.innerHTML = rows.map((p) => `<button class="rk-row" data-id="${esc(p.id)}" data-n="${esc(p.name)}">
+    <div class="rk-pos">${p.pos}</div>
+    <div class="rk-main">
+      <div class="rk-who">${p.avatarUrl ? `<img class="rk-av" src="${esc(p.avatarUrl)}" alt="" loading="lazy">` : `<div class="rk-av">${esc(p.name[0] || '?').toUpperCase()}</div>`}
+        <div style="min-width:0"><div class="rk-name">${esc(p.name)}</div><div class="rk-sub"><b>${esc(p.rank)}</b> &middot; ${p.points} points</div></div></div>
+      <div class="rk-tiers">${MODES.map((m) => chip(m, p.tiers[m.key])).join('')}</div>
+    </div></button>`).join('');
+}
+
+list.addEventListener('click', (e) => {
+  const r = e.target.closest('.rk-row'); if (!r) return;
+  const id = r.dataset.id, name = r.dataset.n;
+  modal.innerHTML = `<div class="modal-box"><img src="/api/card/${encodeURIComponent(id)}.png?v=${Date.now() >> 16}" alt="Battle card of ${esc(name)}">
+    <div class="modal-bar"><div><h3>${esc(name)}</h3><div class="sub">Battle Card</div></div>
+    <div class="modal-act"><a class="btn sm" href="/u/${encodeURIComponent(id)}">Profile</a><button class="btn sm primary" id="mx">Close</button></div></div></div>`;
+  modal.hidden = false; document.body.style.overflow = 'hidden';
+  document.getElementById('mx').focus();
+});
+function close() { modal.hidden = true; modal.innerHTML = ''; document.body.style.overflow = ''; }
+modal.addEventListener('click', (e) => { if (e.target === modal || e.target.id === 'mx') close(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
+
+load();
+</script>
+</body></html>
