@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   if (!body || typeof body.config !== 'object') return json(res, 400, { error: 'bad_request' });
   // only members of the server can publish (the card shows server ranks)
   try { await getCardData(s.id, { fresh: true }); }
-  catch (e) { return json(res, 403, { error: e.code === 'not_in_server' ? 'not_in_server' : 'stats_unavailable' }); }
+  catch (e) { return json(res, 403, { error: e.code === 'not_in_server' || e.code === 'no_rank' ? e.code : 'stats_unavailable' }); }
   const config = sanitizeConfig(body.config);
   const at = Date.now();
   await store.set(`bc:draft:${s.id}`, { config, at });

@@ -1,31 +1,45 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Battle Card Editor</title>
-<meta name="theme-color" content="#060913">
+<title>Editor - AxR Battle Cards</title>
+<meta name="theme-color" content="#05070d">
 <link rel="stylesheet" href="/css/site.css">
 </head><body>
-<header class="topbar"><div class="wrap">
-  <a class="brand" href="/"><i></i><span>AxR <b>CARDS</b></span></a>
-  <div class="userchip" id="chip"></div>
-</div></header>
+<div id="nav"></div>
 <main class="wrap">
   <div id="banner"></div>
-  <div class="loading" id="loading">LOADING EDITOR...</div>
-  <div class="editor" id="editor" hidden>
-    <div class="preview-col">
-      <div class="preview-box">
-        <canvas id="cv"></canvas>
-        <div class="statusline"><span><i class="dot" id="dot"></i><span id="stat">Ready</span></span><span id="sizeinfo"></span></div>
-        <div class="actions-row">
-          <button class="btn primary" id="publish">Publish</button>
-          <button class="btn" id="copy">Copy link</button>
-          <button class="btn" id="dl">Download</button>
-          <a class="btn ghost" id="view" href="#" target="_blank" hidden>My page</a>
+  <div class="loading" id="loading">Loading editor</div>
+
+  <section class="locked" id="locked" hidden>
+    <div class="blur"><canvas id="lockcv"></canvas><div class="lock"><span id="lockic"></span></div></div>
+    <h1 id="lockt">Rank required</h1>
+    <p id="lockp"></p>
+    <div class="actions"><a class="btn" href="/">Back home</a><button class="btn primary" id="recheck">I got ranked, check again</button></div>
+  </section>
+
+  <div class="app" id="app" hidden>
+    <div class="stage-col">
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv"></canvas></div>
+        <div class="bar">
+          <span class="state"><i class="dot" id="dot"></i><span id="stat">Ready</span></span>
+          <span class="tools">
+            <button class="iconbtn" id="undo" title="Undo" disabled></button>
+            <button class="iconbtn" id="redo" title="Redo" disabled></button>
+            <button class="iconbtn" id="reset" title="Reset design"></button>
+          </span>
+        </div>
+        <div class="cta-row">
+          <button class="btn primary" id="publish">Publish card</button>
+          <button class="btn" id="copy"></button>
+          <button class="btn" id="dl"></button>
+        </div>
+        <div class="cta-row" style="grid-template-columns:1fr;padding-top:8px" id="viewrow" hidden>
+          <a class="btn ghost sm" id="view" href="#" target="_blank">Open my public profile</a>
         </div>
       </div>
     </div>
-    <div class="controls">
+    <div class="panel">
       <div class="tabs" id="tabs"></div>
       <div id="panes"></div>
     </div>

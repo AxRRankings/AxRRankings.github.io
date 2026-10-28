@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const [draft, pub] = await Promise.all([store.get(`bc:draft:${s.id}`), store.get(`bc:pub:${s.id}`)]);
   let data = null, problem = null;
   try { data = await getCardData(s.id, { fresh: true }); }
-  catch (e) { problem = e.code === 'not_in_server' ? 'not_in_server' : 'stats_unavailable'; }
+  catch (e) { problem = e.code === 'not_in_server' || e.code === 'no_rank' ? e.code : 'stats_unavailable'; }
   json(res, 200, {
     user: { id: s.id, username: s.username },
     data, problem,

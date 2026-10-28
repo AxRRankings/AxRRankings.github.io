@@ -1,35 +1,43 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Battle Card</title>
-<meta name="theme-color" content="#060913">
+<title>Battle Card - AxR</title>
+<meta name="theme-color" content="#05070d">
 <link rel="stylesheet" href="/css/site.css">
 </head><body>
-<header class="topbar"><div class="wrap">
-  <a class="brand" href="/"><i></i><span>AxR <b>CARDS</b></span></a>
-  <a class="btn ghost" href="/editor" style="padding:6px 14px">Make yours</a>
-</div></header>
-<main class="wrap profile" id="app"><div class="loading">LOADING...</div></main>
-<div id="meta"></div>
+<div id="nav"></div>
+<main class="wrap profile" id="app"><div class="loading">Loading</div></main>
+<footer class="foot"><div class="wrap"><span>AxR RANKINGS</span><span>Not affiliated with Mojang or Discord.</span></div></footer>
 <script type="module">
+import { navHTML, fillNavUser, icon, esc } from '/js/ui.js';
+import { MODES } from '/js/card-core.js';
+document.getElementById('nav').innerHTML = navHTML({ links: false });
+fillNavUser();
 const id = location.pathname.split('/').pop().replace(/\.png$/, '');
 const app = document.getElementById('app');
-const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 try {
   const r = await fetch('/api/profile/' + encodeURIComponent(id));
   if (!r.ok) throw 0;
   const p = await r.json();
   const d = p.data, img = `/api/card/${encodeURIComponent(id)}.png?v=${p.publishedAt}`;
   document.title = `${d.name} - Battle Card`;
-  const chips = Object.entries(d.tiers || {}).map(([m, t]) => `<span class="chip">${esc(m)}<b>${esc(t)}</b></span>`).join('');
+  const tiers = MODES.map((m) => { const t = d.tiers?.[m.key]; return `<div class="tg ${t ? '' : 'empty'}"><span>${m.label}</span><b>${t ? esc(t) : '-'}</b></div>`; }).join('');
+  const ranked = Object.values(d.tiers || {}).filter(Boolean).length;
   app.innerHTML = `
-    <div><h1>${esc(d.name)}</h1><div class="meta">${esc(d.rank?.name || 'Unranked')} &middot; ${d.points} points</div></div>
+    <div class="ph"><div><h1>${esc(d.name)}</h1><span class="pill">${esc(d.rank?.name || 'Unranked')}</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="cp">${icon('link')}Copy image link</button><a class="btn primary" href="${img}" download="battlecard-${esc(id)}.png">${icon('download')}Download PNG</a></div></div>
     <div class="stage"><img src="${img}" alt="Battle card of ${esc(d.name)}"></div>
-    <div class="chips">${chips || '<span class="meta">No tiers yet.</span>'}</div>
-    <div class="box">In Discord type <code>/card</code> for yours, or <code>/card @${esc(d.name)}</code> to show this one.</div>
-    <div><a class="btn" href="${img}" download="battlecard-${esc(id)}.png">Download PNG</a></div>`;
+    <div class="kpis">
+      <div class="kpi"><span>Combat rank</span><b>${esc(d.rank?.name || '-')}</b></div>
+      <div class="kpi"><span>Points</span><b>${d.points}</b></div>
+      <div class="kpi"><span>Ranked modes</span><b>${ranked}/10</b></div>
+      <div class="kpi"><span>Best tier</span><b>${esc(d.best || '-')}</b></div>
+    </div>
+    <div class="tiergrid">${tiers}</div>
+    <div class="box"><h2>Show it in Discord</h2><p>Use <code>/card</code> for your own card, or pick this player to show theirs.</p><a class="btn primary" href="/editor">Make your own card</a></div>`;
+  document.getElementById('cp').onclick = async (e) => { try { await navigator.clipboard.writeText(location.origin + img); e.currentTarget.lastChild.textContent = 'Copied!'; } catch {} };
 } catch {
-  app.innerHTML = '<div class="box"><h2>No card published yet</h2><p class="meta">This player has not published a Battle Card.</p><a class="btn primary" href="/editor">Make yours</a></div>';
+  app.innerHTML = '<div class="box" style="max-width:560px;margin:40px auto;text-align:center"><h2>No card here yet</h2><p>This player has not published a Battle Card, or has no rank.</p><a class="btn primary" href="/editor">Make yours</a></div>';
 }
 </script>
 </body></html>
