@@ -37,6 +37,7 @@ function showLocked(kind) {
   } else {
     $('#lockt').textContent = 'You need a rank to make a card';
     $('#lockp').textContent = 'Battle Cards show real tiers, and you do not have a tier role on the server yet. Get tier tested in the server and your card will unlock here automatically.';
+    if (me.diag && me.diag.tierRolesInServer === 0) $('#lockp').textContent += ' (Admin note: the bot found no tier roles named like "HT1 SWORD" in the server.)';
   }
   const cv = $('#lockcv');
   const demo = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', CART: 'HT1', CRYSTAL: 'LT2' } });
