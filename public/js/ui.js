@@ -29,6 +29,7 @@ export function navHTML({ links = true, right = '' } = {}) {
     <a class="logo" href="/"><i><svg viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></i>AxR<b>CARDS</b></a>
     ${links ? `<nav class="nav-links"><a href="/rankings">Rankings</a><a href="/#features">Features</a><a href="/#gallery">Gallery</a><a href="/#how">How it works</a><a href="/#faq">FAQ</a></nav>` : ''}
     <div class="nav-right" id="navright">${right}</div>
+    ${links ? '<button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>' : ''}
   </div></header>`;
 }
 
@@ -48,3 +49,11 @@ export async function fillNavUser() {
     return null;
   }
 }
+
+// mobile menu toggle (event delegation so it works wherever the nav is rendered)
+document.addEventListener('click', (e) => {
+  const nav = document.querySelector('.nav'); if (!nav) return;
+  const b = e.target.closest('#burger');
+  if (b) { const open = nav.classList.toggle('open'); b.setAttribute('aria-expanded', String(open)); return; }
+  if (e.target.closest('.nav-links a') || !e.target.closest('.nav')) nav.classList.remove('open');
+});
