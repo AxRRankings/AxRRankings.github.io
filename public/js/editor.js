@@ -23,7 +23,7 @@ async function boot() {
   if (me.problem === 'not_in_server' || me.problem === 'no_rank') { showLocked(me.problem); return false; }
   cfg = sanitizeConfig(me.config); data = me.data; publishedAt = me.published?.at || null;
   if (me.problem) {
-    $('#banner').innerHTML = '<div class="banner-msg">Could not read your server roles right now, so the preview uses sample tiers. Publishing is disabled until it works. Try again in a minute.</div>';
+    $('#banner').innerHTML = '<div class="banner-msg">Could not read your server roles right now, so the preview uses sample tiers. Publishing is disabled until it works. Try again in a minute.' + (me.diag?.error ? '<br><small>Reason: ' + esc(me.diag.error) + '</small>' : '') + '</div>';
     data = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT3', AXE: 'LT4', CART: 'HT2' } });
   }
   return true;
