@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
+<title>How it works - AxR Battle Cards</title>
+<meta name="description" content="How Battle Cards, points and combat ranks work.">
+</head><body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="page-head"><div class="crumb"><a href="/">HOME</a> / HOW IT WORKS</div><h1>How it works</h1><p>From tier test to a card in your channel, in four steps.</p></div>
+  <div class="steps">
+    <div class="step"><div><h3>Get tier tested</h3><p>Take a tier test in the AxR Discord server. Staff give you a tier role for each mode you were tested in, for example <code>HT3 SWORD</code>.</p></div></div>
+    <div class="step"><div><h3>Log in with Discord</h3><p>The site only asks for your Discord name and avatar. Your tiers are read from your roles on the server, so there is nothing to type in.</p></div></div>
+    <div class="step"><div><h3>Design your card</h3><p>Open the editor and change the layout, colors, font, background, avatar, border and which tiers show. Changes save automatically. You have nine slots for different designs.</p></div></div>
+    <div class="step"><div><h3>Publish and post</h3><p>Publish the slot you like best. Then type <code>1card</code> in Discord to post it, or <code>1card @someone</code> to show another player's card.</p></div></div>
+  </div>
+  <div class="callout"><div><h3>Ranked players only</h3><p>You need at least one tier role and to be in the server. If you have no rank yet, the editor stays locked until you do.</p></div></div>
+
+  <div class="section"><div class="section-head"><h2>Points and combat rank</h2><p>Every tier is worth points. Add up your best tier in each mode and you get your combat rank.</p></div>
+    <div class="two"><table class="tbl" id="pts"></table><table class="tbl" id="ranks"></table></div></div>
+  <div class="cta-band"><h2>Ready?</h2><p>Open the editor and make your first card.</p><a class="btn primary lg" href="/editor">Open the editor</a></div>
+</main>
+<footer class="foot" id="footer"></footer>
+<script type="module">
+import { mountChrome, fillNavUser } from '/js/ui.js';
+import { TIERS, TIER_POINTS, TIER_COLORS, COMBAT_RANKS } from '/js/card-core.js';
+mountChrome(); fillNavUser();
+document.getElementById('pts').innerHTML = '<tr><th>Tier</th><th>Points</th></tr>' + TIERS.map((t) => '<tr><td><b style="color:' + TIER_COLORS[t] + '">' + t + '</b></td><td>' + TIER_POINTS[t] + '</td></tr>').join('');
+document.getElementById('ranks').innerHTML = '<tr><th>Combat rank</th><th>Total points</th></tr>' + COMBAT_RANKS.map((r) => '<tr><td><b style="color:' + r.color + '">' + r.name + '</b></td><td>' + r.min + (r.max >= 1000 ? '+' : ' - ' + r.max) + '</td></tr>').join('');
+</script></body></html>

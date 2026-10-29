@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = process.cwd();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.ttf': 'font/ttf', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.txt': 'text/plain' };
-const REWRITES = [[/^\/rankings$/, '/rankings.html'], [/^\/editor$/, '/editor.html'], [/^\/u\/[^/]+$/, '/profile.html'], [/^\/card\/(.+)$/, '/api/card/$1']];
+const REWRITES = [[/^\/u\/[^/]+$/, '/profile.html'], [/^\/card\/(.+)$/, '/api/card/$1']];
 
 function findHandler(p) {
   const parts = p.replace(/^\/api\//, '').split('/');
@@ -35,7 +35,8 @@ http.createServer(async (req, res) => {
       const mod = await import(pathToFileURL(h.file).href);
       return await mod.default(req, res);
     }
-    const file = path.join(ROOT, 'public', pathname === '/' ? 'index.html' : pathname);
+    let file = path.join(ROOT, 'public', pathname === '/' ? 'index.html' : pathname);
+    if (!fs.existsSync(file) && fs.existsSync(file + '.html')) file += '.html';   // clean URLs like Vercel
     if (!file.startsWith(path.join(ROOT, 'public')) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.statusCode = 404; return res.end('not found'); }
     res.setHeader('content-type', MIME[path.extname(file)] || 'application/octet-stream');
     fs.createReadStream(file).pipe(res);

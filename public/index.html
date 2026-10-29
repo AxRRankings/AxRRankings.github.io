@@ -1,102 +1,68 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AxR Battle Cards - Design your PvP rank card</title>
-<meta name="description" content="Design a fully custom Minecraft PvP Battle Card with your real AxR tiers, then post it in Discord with /card.">
-<meta name="theme-color" content="#05070d">
-<link rel="stylesheet" href="/css/site.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
+<title>AxR Battle Cards</title>
+<meta name="description" content="Build a custom Battle Card from your AxR Rankings tiers and post it in Discord.">
 </head><body>
 <div id="nav"></div>
-<main class="wrap">
-  <section class="hero">
+<div class="hero-wrap">
+  <canvas class="scape" id="scape"></canvas>
+  <div class="wrap hero">
     <div>
-      <span class="eyebrow">AxR Rankings official tool</span>
-      <h1>Your rank. Your card. <span class="grad-text">Your style.</span></h1>
-      <p class="lead">Build a fully custom Battle Card from your real tier-test results, publish it, and post it anywhere in Discord with <b style="color:var(--text)">/card</b>.</p>
+      <div class="eyebrow">AxR Rankings</div>
+      <h1>Build your <em>Battle Card</em></h1>
+      <p class="lead">Your tiers come straight from the AxR server. You decide how the card looks. Post it in any Discord channel with <code>1card</code>.</p>
       <div class="actions">
-        <a class="btn discord" id="cta" href="/api/auth/login">Login with Discord</a>
+        <a class="btn discord lg" id="cta" href="/api/auth/login">Login with Discord</a>
         <a class="btn lg" href="/rankings">View rankings</a>
       </div>
-      <p class="fine" id="fine"></p>
-      <div id="err"></div>
+      <p class="fine" id="err">Only ranked players can make a card.</p>
     </div>
-    <div class="showcase"><div class="tilt"><canvas id="hero"></canvas></div></div>
+    <div class="frame"><canvas id="hero"></canvas></div>
+  </div>
+</div>
+<main class="wrap">
+  <section class="section">
+    <div class="section-head"><h2>Find your way around</h2><p>Everything has its own page.</p></div>
+    <div class="tiles" id="tiles"></div>
   </section>
 
-  <div class="strip" id="strip"></div>
-
-  <section class="section" id="features">
-    <div class="section-head"><h2>Everything you need to stand out</h2><p>Real server data, total design freedom, and an image that looks identical in the editor and in Discord.</p></div>
-    <div class="features" id="featgrid"></div>
+  <section class="section">
+    <div class="section-head"><h2>Nine card slots</h2><p>Keep up to nine designs and switch between them like items in your hotbar. Press 1 to 9, or tap a slot. Publish the one you want Discord to show.</p></div>
+    <div class="hotdemo"><div>1</div><div>2</div><div class="sel">3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></div>
   </section>
 
-  <section class="section" id="gallery">
-    <div class="section-head"><h2>Make it yours</h2><p>Six starting themes across four layouts. Every color, font and detail is editable.</p></div>
-    <div class="gallery" id="gal"></div>
+  <section class="section" id="topsec" hidden>
+    <div class="section-head"><h2>Top players</h2></div>
+    <div class="toprow" id="top"></div>
+    <p style="margin-top:16px"><a class="btn" href="/rankings">See the full rankings</a></p>
   </section>
 
-  <section class="section" id="how">
-    <div class="section-head"><h2>Ready in a minute</h2></div>
-    <div class="steps">
-      <div class="step"><h3>Login</h3><p>Sign in with Discord. We only read your name and avatar.</p></div>
-      <div class="step"><h3>Design</h3><p>Customize with a live preview. Changes save automatically.</p></div>
-      <div class="step"><h3>Publish</h3><p>One tap publishes it to your profile page.</p></div>
-      <div class="step"><h3>Flex</h3><p>Use <b>/card</b> for yours, or <b>/card @friend</b> for theirs.</p></div>
-    </div>
-    <div class="gate" style="margin-top:18px"><span class="ic" id="gateic"></span><div><h3>Ranked players only</h3><p>Battle Cards show real tiers, so you need at least one tier role on the AxR server to create one. Get tier tested, then come back and build yours.</p></div></div>
-  </section>
-
-  <section class="section" id="faq">
-    <div class="section-head"><h2>Questions</h2></div>
-    <div class="faq">
-      <details><summary>Where do my tiers come from?</summary><p>Straight from your roles on the AxR server (like HT3 SWORD). When your rank changes, your card updates by itself within a couple of minutes.</p></details>
-      <details><summary>Why can't I make a card?</summary><p>You need to be in the server and hold at least one tier role. If you just got tested, wait a minute and refresh.</p></details>
-      <details><summary>Can I show someone else's card?</summary><p>Yes. Use <b>/card</b> and pick a member. It works if they have published a card.</p></details>
-      <details><summary>Is my data safe?</summary><p>We only store your Discord ID, your card design and its saved settings. We never get your password or messages.</p></details>
-    </div>
-  </section>
-
-  <section class="cta"><h2>Ready to forge yours?</h2><p>Takes about a minute.</p><a class="btn discord" id="cta2" href="/api/auth/login">Login with Discord</a></section>
+  <section class="cta-band"><h2>Ready to make yours?</h2><p>Log in with Discord and start designing.</p><a class="btn discord lg" id="cta2" href="/api/auth/login">Login with Discord</a></section>
 </main>
-<footer class="foot"><div class="wrap"><span>AxR RANKINGS</span><span>Not affiliated with Mojang or Discord.</span></div></footer>
-
+<footer class="foot" id="footer"></footer>
 <script type="module">
-import { navHTML, fillNavUser, icon } from '/js/ui.js';
-import { drawCard, cardSize, buildCardData, sanitizeConfig, DEFAULT_CONFIG, THEMES, LAYOUTS, FONTS, MODES } from '/js/card-core.js';
+import { mountChrome, fillNavUser, gem, esc } from '/js/ui.js';
+import { drawScape } from '/js/pixelscape.js';
+import { drawCard, cardSize, buildCardData, sanitizeConfig, DEFAULT_CONFIG } from '/js/card-core.js';
 import { loadFonts } from '/js/boot.js';
-
-document.getElementById('nav').innerHTML = navHTML();
-document.getElementById('gateic').innerHTML = icon('lock');
-document.getElementById('fine').innerHTML = icon('shield') + 'Tiers sync live from your server roles';
-if (new URLSearchParams(location.search).get('error')) document.getElementById('err').innerHTML = '<div class="notice">Login failed. Please try again.</div>';
-
-document.getElementById('strip').innerHTML = [[MODES.length, 'Modes'], [Object.keys(LAYOUTS).length, 'Layouts'], [Object.keys(FONTS).length, 'Fonts'], [Object.keys(THEMES).length, 'Themes']]
-  .map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join('');
-const feats = [
-  ['palette', 'Total customization', 'Backgrounds, gradients, patterns, colors, fonts, borders, avatar shape and more.'],
-  ['chart', 'Real stats, automatic', 'Tiers and combat rank are pulled from your server roles. Nothing to type in.'],
-  ['eye', 'Live preview', 'See every change instantly. What you see is exactly what Discord shows.'],
-  ['send', 'Post with /card', "Send your published card to any channel, or pull up another player's."],
-  ['image', 'Your own images', 'Use your own background, banner and avatar by link or upload.'],
-  ['shield', 'Ranked players only', 'Only members with a tier role can publish, so every card is earned.'],
-];
-document.getElementById('featgrid').innerHTML = feats.map(([i, t, d]) => `<div class="feature"><div class="ic">${icon(i)}</div><h3>${t}</h3><p>${d}</p></div>`).join('');
-
-fillNavUser().then((m) => { if (m) for (const id of ['cta', 'cta2']) { const c = document.getElementById(id); c.textContent = 'Open the editor'; c.href = '/editor'; } });
-
+mountChrome();
+if (new URLSearchParams(location.search).get('error')) document.getElementById('err').innerHTML = '<span style="color:#ffb3b5">Login failed. Please try again.</span>';
+fillNavUser().then((m) => { if (m) for (const id of ['cta', 'cta2']) { const c = document.getElementById(id); c.textContent = 'Open the editor'; c.href = '/editor'; c.classList.remove('discord'); c.classList.add('primary'); } });
+drawScape(document.getElementById('scape'));
+const tiles = [['diamond', 'Rankings', 'See every ranked player and open their card.', '/rankings'], ['emerald', 'Card editor', 'Design your card with a live preview.', '/editor'], ['gold', 'Gallery', 'Example cards you can start from.', '/gallery'],
+  ['lapis', 'How it works', 'Points, combat ranks and the steps.', '/how-it-works'], ['amethyst', 'FAQ', 'Answers to the usual questions.', '/faq'], ['redstone', 'Bot commands', 'How to post cards in Discord.', '/commands']];
+document.getElementById('tiles').innerHTML = tiles.map(([g, t, d, h]) => '<a class="tile" href="' + h + '"><div class="gslot inset">' + gem(g, 40) + '</div><div><h3>' + t + '</h3><p>' + d + '</p></div></a>').join('');
 await loadFonts();
-const sample = (tiers) => buildCardData({ name: 'Steve', handle: 'steve', avatarInitial: 'S', tiers });
-const T1 = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', CART: 'HT3', CRYSTAL: 'LT2' };
-function paint(cv, cfg, data) { const c = sanitizeConfig(cfg); const s = cardSize(c); cv.width = s.width; cv.height = s.height; drawCard(cv.getContext('2d'), c, data, {}); }
-paint(document.getElementById('hero'), DEFAULT_CONFIG, sample(T1));
-
-const combos = [['Neon Cyan', 'classic', 'orbitron'], ['Redstone', 'split', 'russo'], ['Emerald', 'showcase', 'chakra'], ['Ender', 'classic', 'audiowide'], ['Gold Rush', 'compact', 'rajdhani'], ['Frostbite', 'split', 'orbitron']];
-const gal = document.getElementById('gal');
-for (const [theme, layout, font] of combos) {
-  const t = THEMES[theme];
-  const cfg = { ...DEFAULT_CONFIG, layout, font, colors: { ...DEFAULT_CONFIG.colors, ...t.colors }, bg: { ...DEFAULT_CONFIG.bg, ...t.bg } };
-  const f = document.createElement('figure'); f.innerHTML = `<canvas></canvas><figcaption><b>${theme.toUpperCase()}</b><span>${LAYOUTS[layout].label} layout</span></figcaption>`;
-  gal.appendChild(f); paint(f.querySelector('canvas'), cfg, sample(T1));
-}
+const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', CART: 'HT3', CRYSTAL: 'LT2' };
+const cfg = sanitizeConfig(DEFAULT_CONFIG), cv = document.getElementById('hero'), s = cardSize(cfg);
+cv.width = s.width; cv.height = s.height; drawCard(cv.getContext('2d'), cfg, buildCardData({ name: 'Steve', handle: 'steve', avatarInitial: 'S', tiers: T }), {});
+try {
+  const j = await (await fetch('/api/rankings')).json();
+  if (j.players?.length) {
+    document.getElementById('top').innerHTML = j.players.slice(0, 5).map((p) => '<a class="top-item" href="/rankings"><span class="n">' + p.pos + '</span>' + (p.avatarUrl ? '<img src="' + esc(p.avatarUrl) + '" alt="">' : '<span class="av">' + esc(p.name[0] || '?') + '</span>') + '<span class="nm">' + esc(p.name) + '</span><span class="pt">' + esc(p.rank) + ' &middot; ' + p.points + ' pts</span></a>').join('');
+    document.getElementById('topsec').hidden = false;
+  }
+} catch {}
 </script>
 </body></html>

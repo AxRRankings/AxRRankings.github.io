@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
+<title>Bot commands - AxR Battle Cards</title>
+<meta name="description" content="How to post Battle Cards in Discord.">
+</head><body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="page-head"><div class="crumb"><a href="/">HOME</a> / COMMANDS</div><h1>Bot commands</h1><p>The bot prefix is <code>1</code>.</p></div>
+  <div class="two">
+    <div class="box"><h2>1card</h2><p>Posts your own published Battle Card in the channel.</p><div class="discordmock"><div class="m"><div class="a">Y</div><div><b>You</b><div class="t">1card</div></div></div><div class="m"><div class="a bot">B</div><div><b>AxR Bot</b><div class="t">Your card image appears here.</div><canvas id="demo1"></canvas></div></div></div></div>
+    <div class="box"><h2>1card @player</h2><p>Posts another player's card. Mention them or use their user ID. They need to have published a card.</p><div class="discordmock"><div class="m"><div class="a">Y</div><div><b>You</b><div class="t">1card @Steve</div></div></div><div class="m"><div class="a bot">B</div><div><b>AxR Bot</b><div class="t">Steve's card appears here.</div><canvas id="demo2"></canvas></div></div></div></div>
+  </div>
+  <div class="callout"><div><h3>No card yet?</h3><p>The bot will tell you. Open the editor, make a card and press Publish card first.</p></div></div>
+  <p style="margin-top:22px"><a class="btn primary" href="/editor">Open the editor</a></p>
+</main>
+<footer class="foot" id="footer"></footer>
+<script type="module">
+import { mountChrome, fillNavUser } from '/js/ui.js';
+import { drawCard, cardSize, buildCardData, sanitizeConfig, DEFAULT_CONFIG, THEMES } from '/js/card-core.js';
+import { loadFonts } from '/js/boot.js';
+mountChrome(); fillNavUser(); await loadFonts();
+const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', CART: 'HT3', CRYSTAL: 'LT2' };
+const paint = (id, cfg, name) => { const c = sanitizeConfig(cfg), cv = document.getElementById(id), s = cardSize(c); cv.width = s.width; cv.height = s.height; drawCard(cv.getContext('2d'), c, buildCardData({ name, handle: name.toLowerCase(), avatarInitial: name[0], tiers: T }), {}); };
+paint('demo1', DEFAULT_CONFIG, 'You');
+const t = THEMES['Redstone']; paint('demo2', { ...DEFAULT_CONFIG, layout: 'split', colors: { ...DEFAULT_CONFIG.colors, ...t.colors }, bg: { ...DEFAULT_CONFIG.bg, ...t.bg } }, 'Steve');
+</script></body></html>

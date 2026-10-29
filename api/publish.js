@@ -3,6 +3,7 @@ import { requireUser, requirePost, limited } from '../lib/guard.js';
 import * as store from '../lib/store.js';
 import { getCardData } from '../lib/discord.js';
 import { sanitizeConfig } from '../public/js/card-core.js';
+import { slotKey, metaKey, emptyMeta, parseSlot } from '../lib/slots.js';
 
 export default async function handler(req, res) {
   if (!requirePost(req, res)) return;
@@ -10,12 +11,16 @@ export default async function handler(req, res) {
   if (await limited(res, s.id, 'publish', 10)) return;
   const body = await readJson(req, 900_000);
   if (!body || typeof body.config !== 'object') return json(res, 400, { error: 'bad_request' });
-  // only members of the server can publish (the card shows server ranks)
+  // only ranked members of the server can publish (the card shows server ranks)
   try { await getCardData(s.id, { fresh: true }); }
   catch (e) { return json(res, 403, { error: e.code === 'not_in_server' || e.code === 'no_rank' ? e.code : 'stats_unavailable' }); }
+  const slot = parseSlot(body.slot);
   const config = sanitizeConfig(body.config);
   const at = Date.now();
-  await store.set(`bc:draft:${s.id}`, { config, at });
-  await store.set(`bc:pub:${s.id}`, { config, at });
-  json(res, 200, { ok: true, publishedAt: at, imageUrl: `/api/card/${s.id}.png`, profileUrl: `/u/${s.id}` });
+  const meta = { ...emptyMeta(), ...((await store.get(metaKey(s.id))) || {}) };
+  meta.last = slot; meta.active = slot;
+  await store.set(slotKey(s.id, slot), { config, at });
+  await store.set(`bc:pub:${s.id}`, { config, at });     // what /card and the rankings pop-up show
+  await store.set(metaKey(s.id), meta);
+  json(res, 200, { ok: true, publishedAt: at, active: slot, imageUrl: `/api/card/${s.id}.png`, profileUrl: `/u/${s.id}` });
 }

@@ -1,9 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
 <title>Editor - AxR Battle Cards</title>
-<meta name="theme-color" content="#05070d">
-<link rel="stylesheet" href="/css/site.css">
 </head><body>
 <div id="nav"></div>
 <main class="wrap">
@@ -11,7 +9,7 @@
   <div class="loading" id="loading">Loading editor</div>
 
   <section class="locked" id="locked" hidden>
-    <div class="blur"><canvas id="lockcv"></canvas><div class="lock"><span id="lockic"></span></div></div>
+    <div class="blur"><canvas id="lockcv"></canvas><div class="lock">LOCKED</div></div>
     <h1 id="lockt">Rank required</h1>
     <p id="lockp"></p>
     <div class="actions"><a class="btn" href="/">Back home</a><button class="btn primary" id="recheck">I got ranked, check again</button></div>
@@ -26,17 +24,26 @@
           <span class="tools">
             <button class="iconbtn" id="undo" title="Undo" disabled></button>
             <button class="iconbtn" id="redo" title="Redo" disabled></button>
-            <button class="iconbtn" id="reset" title="Reset design"></button>
+            <button class="iconbtn" id="reset" title="Reset this card"></button>
           </span>
         </div>
+        <div class="hotbar-wrap">
+          <div class="hotbar" id="hotbar"></div>
+          <div class="hb-info">
+            <div class="hb-name" id="hbname"></div>
+            <div class="hb-actions">
+              <button class="iconbtn" id="rename" title="Rename this card"></button>
+              <button class="iconbtn" id="dup" title="Copy to the next empty slot"></button>
+              <button class="iconbtn" id="clear" title="Empty this slot"></button>
+            </div>
+          </div>
+        </div>
         <div class="cta-row">
-          <button class="btn primary" id="publish">Publish card</button>
+          <button class="btn primary" id="publish">Publish this card</button>
           <button class="btn" id="copy"></button>
           <button class="btn" id="dl"></button>
         </div>
-        <div class="cta-row" style="grid-template-columns:1fr;padding-top:8px" id="viewrow" hidden>
-          <a class="btn ghost sm" id="view" href="#" target="_blank">Open my public profile</a>
-        </div>
+        <div style="padding-top:8px" id="viewrow" hidden><a class="btn sm ghost" id="view" href="#" target="_blank" style="width:100%">Open my public profile</a></div>
       </div>
     </div>
     <div class="panel">
@@ -45,5 +52,6 @@
     </div>
   </div>
 </main>
+<footer class="foot" id="footer"></footer>
 <script type="module" src="/js/editor.js"></script>
 </body></html>

@@ -8,14 +8,6 @@
   },
   "rewrites": [
     {
-      "source": "/rankings",
-      "destination": "/rankings.html"
-    },
-    {
-      "source": "/editor",
-      "destination": "/editor.html"
-    },
-    {
       "source": "/u/:id",
       "destination": "/profile.html"
     },
@@ -34,5 +26,6 @@
         }
       ]
     }
-  ]
+  ],
+  "cleanUrls": true
 }
