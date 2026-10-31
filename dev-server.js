@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = process.cwd();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.ttf': 'font/ttf', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.txt': 'text/plain' };
-const REWRITES = [[/^\/u\/[^/]+$/, '/profile.html'], [/^\/card\/(.+)$/, '/api/card/$1']];
+const REWRITES = [[/^\/api\/tournament$/, '/api/tourney'], [/^\/u\/[^/]+$/, '/profile.html'], [/^\/card\/(.+)$/, '/api/card/$1']];
 
 function findHandler(p) {
   const parts = p.replace(/^\/api\//, '').split('/');

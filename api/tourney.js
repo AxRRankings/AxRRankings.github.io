@@ -11,8 +11,24 @@ const site = (req) => (process.env.SITE_URL || `https://${req.headers.host}`).re
 const goodKey = (a, b) => { const x = Buffer.from(String(a || '')), y = Buffer.from(String(b || '')); return x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y); };
 const uid = (v) => { const m = String(v || '').match(/\d{15,22}/); return m ? m[0] : null; };
 
+async function publicView(req, res) {
+  const t = await T.load();
+  const hist = await T.history();
+  if (!t) return json(res, 200, { t: null, history: hist }, { 'cache-control': 'public, s-maxage=5, stale-while-revalidate=20' });
+  const total = t.rounds.length;
+  json(res, 200, {
+    history: hist,
+    t: {
+      id: t.id, name: t.name, mode: t.mode, status: t.status, startedAt: t.startedAt || null, finishedAt: t.finishedAt || null, champion: t.champion || null,
+      entrants: t.entrants.map((e) => ({ id: e.id, name: e.name, avatarUrl: e.avatarUrl || '', points: e.points, seed: e.seed || null })),
+      rounds: t.rounds, roundNames: t.rounds.map((_, r) => T.roundName(r, total)),
+    },
+  }, { 'cache-control': 'public, s-maxage=5, stale-while-revalidate=20' });
+}
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return json(res, 405, { error: 'method_not_allowed' }, { allow: 'POST' });
+  if (req.method === 'GET') return publicView(req, res);
+  if (req.method !== 'POST') return json(res, 405, { error: 'method_not_allowed' }, { allow: 'GET, POST' });
   if (await limited(res, 'bot', 'tourney', 240)) return;
   const b = await readJson(req, 20_000);
   if (!b || !process.env.TOURNAMENT_KEY || !goodKey(b.key, process.env.TOURNAMENT_KEY)) return json(res, 401, { ok: false, msg: 'Not allowed.' });

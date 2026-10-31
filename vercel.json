@@ -8,6 +8,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/tournament",
+      "destination": "/api/tourney"
+    },
+    {
       "source": "/u/:id",
       "destination": "/profile.html"
     },
