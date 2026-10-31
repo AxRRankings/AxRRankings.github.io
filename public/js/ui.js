@@ -41,7 +41,7 @@ export function gem(name = 'diamond', size = 40) {
   return `<svg class="gem" width="${size}" height="${size}" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
 
-const LINKS = [['/rankings', 'Rankings'], ['/gallery', 'Gallery'], ['/how-it-works', 'How it works'], ['/faq', 'FAQ'], ['/commands', 'Commands']];
+const LINKS = [['/rankings', 'Rankings'], ['/tournament', 'Tournament'], ['/gallery', 'Gallery'], ['/how-it-works', 'How it works'], ['/faq', 'FAQ'], ['/commands', 'Commands']];
 function navHTML() {
   const here = location.pathname.replace(/\/$/, '').replace(/\.html$/, '');
   return `<header class="nav"><div class="wrap">
@@ -55,7 +55,7 @@ function navHTML() {
 function footHTML() {
   return `<div class="wrap"><div class="foot-grid">
     <div class="brandcol"><a class="logo" href="/"><img src="/favicon.svg" alt="">AxR<b>CARDS</b></a><p style="margin-top:14px;max-width:320px">Custom Battle Cards for the AxR Rankings Minecraft PvP community.</p></div>
-    <div><h4>Explore</h4><a href="/rankings">Rankings</a><a href="/gallery">Gallery</a><a href="/editor">Card editor</a></div>
+    <div><h4>Explore</h4><a href="/rankings">Rankings</a><a href="/tournament">Tournament</a><a href="/gallery">Gallery</a><a href="/editor">Card editor</a></div>
     <div><h4>Learn</h4><a href="/how-it-works">How it works</a><a href="/faq">FAQ</a><a href="/commands">Bot commands</a></div>
     <div><h4>Legal</h4><a href="/privacy">Privacy &amp; terms</a></div>
   </div><div class="small"><span>&copy; AxR Rankings</span><span>Not affiliated with Mojang Studios, Microsoft or Discord.</span></div></div>`;

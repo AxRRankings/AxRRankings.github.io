@@ -1,0 +1,89 @@
+AxR tournament commands. Make one BDFD command per block: the trigger is the first word (tjoin, tleave, ...). Prefix is 1.
+Keep these scripts private: the key lets anyone run staff actions through the API.
+
+==================== TRIGGER: tjoin ====================
+Usage: 1tjoin
+Join the tournament (anyone in the server).
+
+$nomention
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"join","user":"$authorID","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tleave ====================
+Usage: 1tleave
+Leave the tournament before it starts.
+
+$nomention
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"leave","user":"$authorID","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tinfo ====================
+Usage: 1tinfo
+Show the tournament status and link.
+
+$nomention
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"info","user":"","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tcreate ====================
+Usage: 1tcreate <mode> <name>  e.g. 1tcreate SWORD Halloween Cup   (STAFF)
+Open a new tournament. Mode is optional (SWORD, AXE, UHC, DPOT, NPOT, SMP, SMACE, EMACE, CART, CRYSTAL). Do not use quote marks in the name.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"create","user":"","text":"$message"}]
+$httpResult[msg]
+
+==================== TRIGGER: tstart ====================
+Usage: 1tstart   (STAFF)
+Close sign-ups, seed by points and build the bracket.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"start","user":"","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: twin ====================
+Usage: 1twin @winner   (STAFF)
+Report the winner of that player's current match.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"win","user":"$findUser[$message[1];no]","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tundo ====================
+Usage: 1tundo   (STAFF)
+Undo the last reported result.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"undo","user":"","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tkick ====================
+Usage: 1tkick @player   (STAFF)
+Remove a player before the start.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"kick","user":"$findUser[$message[1];no]","text":""}]
+$httpResult[msg]
+
+==================== TRIGGER: tcancel ====================
+Usage: 1tcancel   (STAFF)
+Cancel the current tournament.
+
+$nomention
+$onlyPerms[manageserver;❌ Only staff can use this command.]
+$httpAddHeader[Content-Type;application/json]
+$httpPost[https://axrrankings.vercel.app/api/tourney;{"key":"YOUR_TOURNAMENT_KEY","action":"cancel","user":"","text":""}]
+$httpResult[msg]

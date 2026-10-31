@@ -22,6 +22,7 @@
   </div>
 </div>
 <main class="wrap">
+  <div class="t-banner" id="tbanner" hidden><div><b id="tbt"></b><span id="tbs"></span></div><a class="btn primary" href="/tournament">Open bracket</a></div>
   <section class="section">
     <div class="section-head"><h2>Find your way around</h2><p>Everything has its own page.</p></div>
     <div class="tiles" id="tiles"></div>
@@ -50,8 +51,12 @@ mountChrome();
 if (new URLSearchParams(location.search).get('error')) document.getElementById('err').innerHTML = '<span style="color:#ffb3b5">Login failed. Please try again.</span>';
 fillNavUser().then((m) => { if (m) for (const id of ['cta', 'cta2']) { const c = document.getElementById(id); c.textContent = 'Open the editor'; c.href = '/editor'; c.classList.remove('discord'); c.classList.add('primary'); } });
 drawScape(document.getElementById('scape'));
+fetch('/api/tournament').then((r) => r.json()).then((j) => { const t = j.t; if (!t || (t.status !== 'open' && t.status !== 'live')) return;
+  document.getElementById('tbt').textContent = t.name.toUpperCase() + (t.status === 'open' ? ' IS OPEN' : ' IS LIVE');
+  document.getElementById('tbs').textContent = t.status === 'open' ? 'Sign-ups are open. Type 1tjoin in the server. ' + t.entrants.length + ' joined so far.' : 'Follow the live bracket.';
+  document.getElementById('tbanner').hidden = false; }).catch(() => {});
 const tiles = [['diamond', 'Rankings', 'See every ranked player and open their card.', '/rankings'], ['emerald', 'Card editor', 'Design your card with a live preview.', '/editor'], ['gold', 'Gallery', 'Example cards you can start from.', '/gallery'],
-  ['lapis', 'How it works', 'Points, combat ranks and the steps.', '/how-it-works'], ['amethyst', 'FAQ', 'Answers to the usual questions.', '/faq'], ['redstone', 'Bot commands', 'How to post cards in Discord.', '/commands']];
+  ['lapis', 'How it works', 'Points, combat ranks and the steps.', '/how-it-works'], ['amethyst', 'FAQ', 'Answers to the usual questions.', '/faq'], ['redstone', 'Bot commands', 'How to post cards in Discord.', '/commands'], ['gold', 'Tournament', 'Live bracket and sign-ups.', '/tournament']];
 document.getElementById('tiles').innerHTML = tiles.map(([g, t, d, h]) => '<a class="tile" href="' + h + '"><div class="gslot inset">' + gem(g, 40) + '</div><div><h3>' + t + '</h3><p>' + d + '</p></div></a>').join('');
 await loadFonts();
 const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', CART: 'HT3', CRYSTAL: 'LT2' };
