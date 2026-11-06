@@ -40,9 +40,10 @@ async function boot() {
 }
 
 function showLocked(kind) {
+  if ($('#lockwho') && me && me.user) $('#lockwho').textContent = 'Logged in as ' + me.user.username + ' (ID ' + me.user.id + ')';
   if (kind === 'not_in_server') {
     $('#lockt').textContent = 'Join the AxR server first';
-    $('#lockp').textContent = 'Battle Cards are for members of the AxR Rankings Discord server. Join the server, get tier tested, then come back to build your card.';
+    $('#lockp').textContent = 'We could not find this Discord account in the AxR Rankings server. If you are in the server on a different account, tap "Use a different Discord account" below. Otherwise join the server, get tier tested, then come back.';
   } else {
     $('#lockt').textContent = 'You need a rank to make a card';
     $('#lockp').textContent = 'Battle Cards show real tiers, and you do not have a tier role on the server yet. Get tier tested in the server and the editor will unlock here automatically.';

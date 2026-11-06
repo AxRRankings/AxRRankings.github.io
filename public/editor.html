@@ -12,7 +12,8 @@
     <div class="blur"><canvas id="lockcv"></canvas><div class="lock">LOCKED</div></div>
     <h1 id="lockt">Rank required</h1>
     <p id="lockp"></p>
-    <div class="actions"><a class="btn" href="/">Back home</a><button class="btn primary" id="recheck">I got ranked, check again</button></div>
+    <p id="lockwho" class="muted"></p>
+    <div class="actions"><a class="btn" href="/">Back home</a><button class="btn primary" id="recheck">I got ranked, check again</button><a class="btn" id="switchacct" href="/api/auth/logout?then=login">Use a different Discord account</a></div>
   </section>
 
   <div class="app" id="app" hidden>

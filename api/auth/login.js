@@ -8,5 +8,6 @@ export default function handler(req, res) {
     return redirect(res, '/editor', { 'set-cookie': sessionCookie(req, { id: 'demo', username: 'demo' }) });
   }
   const state = crypto.randomBytes(16).toString('hex');
-  redirect(res, oauthUrl(`${baseUrl(req)}/api/auth/callback`, state), { 'set-cookie': stateCookie(req, state) });
+  const consent = new URL(req.url, 'http://x').searchParams.get('switch') === '1';   // show Discord's account screen so the player can pick another account
+  redirect(res, oauthUrl(`${baseUrl(req)}/api/auth/callback`, state, { consent }), { 'set-cookie': stateCookie(req, state) });
 }
