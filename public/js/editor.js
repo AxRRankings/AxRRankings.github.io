@@ -40,7 +40,11 @@ async function boot() {
 }
 
 function showLocked(kind) {
-  if ($('#lockwho') && me && me.user) $('#lockwho').textContent = 'Logged in as ' + me.user.username + ' (ID ' + me.user.id + ')';
+  if ($('#lockwho') && me && me.user) {
+    let t = 'Logged in as ' + me.user.username + ' (ID ' + me.user.id + ')';
+    if (me.diag && me.diag.discordStatus) t += ' | Discord answered: ' + me.diag.discordStatus + (me.diag.discordCode ? ' code ' + me.diag.discordCode : '') + (me.diag.discordMessage ? ' "' + me.diag.discordMessage + '"' : '') + ' | server …' + me.diag.serverEnding;
+    $('#lockwho').textContent = t;
+  }
   if (kind === 'not_in_server') {
     $('#lockt').textContent = 'Join the AxR server first';
     $('#lockp').textContent = 'We could not find this Discord account in the AxR Rankings server. If you are in the server on a different account, tap "Use a different Discord account" below. Otherwise join the server, get tier tested, then come back.';
