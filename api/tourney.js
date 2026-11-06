@@ -3,7 +3,7 @@
 import crypto from 'node:crypto';
 import { json, readJson } from '../lib/http.js';
 import { limited } from '../lib/guard.js';
-import { getMemberLite } from '../lib/discord.js';
+import { getMemberLite, wlAll, wlSave } from '../lib/discord.js';
 import * as T from '../lib/tournament.js';
 
 const reply = (res, ok, msg, extra = {}) => json(res, 200, { ok, msg: String(msg).slice(0, 1800), ...extra });
@@ -34,6 +34,18 @@ export default async function handler(req, res) {
   if (!b || !process.env.TOURNAMENT_KEY || !goodKey(b.key, process.env.TOURNAMENT_KEY)) return json(res, 401, { ok: false, msg: 'Not allowed.' });
   const action = String(b.action || ''), user = uid(b.user), text = String(b.text || '').slice(0, 200);
   const link = `${site(req)}/tournament`;
+
+  if (action.startsWith('wl_')) {
+    const owner = process.env.OWNER_ID;
+    if (!owner || uid(b.by || b.user) !== owner) return reply(res, false, '❌ Only the owner can use the whitelist.');
+    const m = await wlAll();
+    const tgt = uid(b.target || text);
+    if (action === 'wl_list') { const ids = Object.keys(m); return reply(res, true, ids.length ? `**Whitelist (${ids.length})**\n` + ids.map((i) => `<@${i}> \`${i}\`${m[i].name ? ' - ' + m[i].name : ''}`).join('\n') : 'The whitelist is empty.'); }
+    if (!tgt) return reply(res, false, '❌ Give a Discord user ID or @mention.');
+    if (action === 'wl_add') { const name = text.replace(/<@!?\d+>|\d{15,22}/g, '').trim().slice(0, 32); m[tgt] = { name, at: Date.now() }; await wlSave(m); return reply(res, true, `✅ Whitelisted <@${tgt}> (\`${tgt}\`). They can open the card editor now.`); }
+    if (action === 'wl_remove') { if (!m[tgt]) return reply(res, false, '❌ That ID is not whitelisted.'); delete m[tgt]; await wlSave(m); return reply(res, true, `✅ Removed \`${tgt}\` from the whitelist.`); }
+    return reply(res, false, '❌ Unknown whitelist action.');
+  }
 
   try {
     return await T.locked(async () => {
