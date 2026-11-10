@@ -13,7 +13,7 @@ export const MODES = [
   { key: 'SMP',     label: 'SMP'     },
   { key: 'SMACE',   label: 'SMACE'   },
   { key: 'EMACE',   label: 'EMACE'   },
-  { key: 'CART',    label: 'CART'    },
+  { key: 'DSMP',    label: 'DSMP'    },
   { key: 'CRYSTAL', label: 'CRYSTAL' },
 ];
 export const MODE_KEYS = MODES.map((m) => m.key);

@@ -30,7 +30,7 @@ $httpResult[msg]
 
 ==================== TRIGGER: tcreate ====================
 Usage: 1tcreate <mode> <name>  e.g. 1tcreate SWORD Halloween Cup   (STAFF)
-Open a new tournament. Mode is optional (SWORD, AXE, UHC, DPOT, NPOT, SMP, SMACE, EMACE, CART, CRYSTAL). Do not use quote marks in the name.
+Open a new tournament. Mode is optional (SWORD, AXE, UHC, DPOT, NPOT, SMP, SMACE, EMACE, DSMP, CRYSTAL). Do not use quote marks in the name.
 
 $nomention
 $onlyPerms[manageserver;❌ Only staff can use this command.]

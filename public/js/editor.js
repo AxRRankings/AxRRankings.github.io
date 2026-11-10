@@ -34,7 +34,7 @@ async function boot() {
   cfg = slots[cur] ? clone(slots[cur].config) : sanitizeConfig(clone(DEFAULT_CONFIG));
   if (me.problem) {
     $('#banner').innerHTML = '<div class="banner-msg">Could not read your server roles right now, so the preview uses sample tiers. Publishing is disabled until it works. Try again in a minute.' + (me.diag?.error ? '<br><small>Reason: ' + esc(me.diag.error) + '</small>' : '') + '</div>';
-    data = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT3', AXE: 'LT4', CART: 'HT2' } });
+    data = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT3', AXE: 'LT4', DSMP: 'HT2' } });
   }
   return true;
 }
@@ -54,7 +54,7 @@ function showLocked(kind) {
     if (me.diag && me.diag.tierRolesInServer === 0) $('#lockp').textContent += ' (Admin note: the bot found no tier roles named like "HT1 SWORD" in the server.)';
   }
   const cv = $('#lockcv');
-  const demo = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', CART: 'HT1', CRYSTAL: 'LT2' } });
+  const demo = buildCardData({ name: me.user.username, handle: me.user.username, avatarInitial: (me.user.username[0] || '?').toUpperCase(), tiers: { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DSMP: 'HT1', CRYSTAL: 'LT2' } });
   const c = sanitizeConfig(DEFAULT_CONFIG); const s = cardSize(c); cv.width = s.width; cv.height = s.height;
   drawCard(cv.getContext('2d'), c, demo, {});
   $('#locked').hidden = false;

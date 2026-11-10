@@ -6,7 +6,7 @@ const out = process.argv[2] || './out';
 fs.mkdirSync(out, { recursive: true });
 const data = buildCardData({
   name: 'Jexu', handle: 'jexu5501',
-  tiers: { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT4', DPOT: 'LT5', NPOT: 'HT1', SMP: null, SMACE: 'LT2', EMACE: null, CART: 'HT3', CRYSTAL: 'LT4' },
+  tiers: { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT4', DPOT: 'LT5', NPOT: 'HT1', SMP: null, SMACE: 'LT2', EMACE: null, DSMP: 'HT3', CRYSTAL: 'LT4' },
 });
 const variants = {
   classic: { layout: 'classic' },

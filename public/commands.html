@@ -20,7 +20,7 @@ import { mountChrome, fillNavUser } from '/js/ui.js';
 import { drawCard, cardSize, buildCardData, sanitizeConfig, DEFAULT_CONFIG, THEMES } from '/js/card-core.js';
 import { loadFonts } from '/js/boot.js';
 mountChrome(); fillNavUser(); await loadFonts();
-const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', CART: 'HT3', CRYSTAL: 'LT2' };
+const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', DSMP: 'HT3', CRYSTAL: 'LT2' };
 const paint = (id, cfg, name) => { const c = sanitizeConfig(cfg), cv = document.getElementById(id), s = cardSize(c); cv.width = s.width; cv.height = s.height; drawCard(cv.getContext('2d'), c, buildCardData({ name, handle: name.toLowerCase(), avatarInitial: name[0], tiers: T }), {}); };
 paint('demo1', DEFAULT_CONFIG, 'You');
 const t = THEMES['Redstone']; paint('demo2', { ...DEFAULT_CONFIG, layout: 'split', colors: { ...DEFAULT_CONFIG.colors, ...t.colors }, bg: { ...DEFAULT_CONFIG.bg, ...t.bg } }, 'Steve');

@@ -1,7 +1,7 @@
 # AxR Battle Cards
 
 Players log in with Discord, design a Battle Card with a live preview, publish it, and `/card` posts that exact image in Discord.
-Tiers and combat rank are read automatically from the server roles (`HT1 CART`, `LT5 SWORD`, ...).
+Tiers and combat rank are read automatically from the server roles (`HT1 DSMP`, `LT5 SWORD`, ...).
 
 ## Deploy (works from a phone)
 
