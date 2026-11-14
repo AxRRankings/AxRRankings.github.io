@@ -85,6 +85,17 @@ export const FONTS = {
   audiowide: { label: 'Audiowide',      family: 'BC Audiowide',     file: 'Audiowide.ttf',       scale: 0.9  },
   chakra:    { label: 'Chakra Petch',   family: 'BC Chakra Petch',  file: 'ChakraPetchBold.ttf', scale: 1.0  },
   mono:      { label: 'Share Tech Mono',family: 'BC Share Tech',    file: 'ShareTechMono.ttf',   scale: 1.05 },
+  bungee:    { label: 'Bungee',         family: 'BC Bungee',        file: 'Bungee-Regular.ttf',  scale: 0.85 },
+  bangers:   { label: 'Bangers',        family: 'BC Bangers',       file: 'Bangers-Regular.ttf', scale: 1.1  },
+  blackops:  { label: 'Black Ops One',  family: 'BC Black Ops',     file: 'BlackOpsOne-Regular.ttf', scale: 0.9 },
+  bebas:     { label: 'Bebas Neue',     family: 'BC Bebas Neue',    file: 'BebasNeue-Regular.ttf', scale: 1.2 },
+  anton:     { label: 'Anton',          family: 'BC Anton',         file: 'Anton-Regular.ttf',   scale: 1.0  },
+  monoton:   { label: 'Monoton',        family: 'BC Monoton',       file: 'Monoton-Regular.ttf', scale: 0.8  },
+  metal:     { label: 'Metal Mania',    family: 'BC Metal Mania',   file: 'MetalMania-Regular.ttf', scale: 1.0 },
+  creepster: { label: 'Creepster',      family: 'BC Creepster',     file: 'Creepster-Regular.ttf', scale: 1.1 },
+  pirata:    { label: 'Pirata One',     family: 'BC Pirata One',    file: 'PirataOne-Regular.ttf', scale: 1.2 },
+  michroma:  { label: 'Michroma',       family: 'BC Michroma',      file: 'Michroma-Regular.ttf', scale: 0.8 },
+  glitch:    { label: 'Rubik Glitch',   family: 'BC Rubik Glitch',  file: 'RubikGlitch-Regular.ttf', scale: 0.9 },
 };
 
 export const LAYOUTS = {
