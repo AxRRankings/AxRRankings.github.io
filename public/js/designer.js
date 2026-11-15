@@ -149,6 +149,23 @@ $('#save').onclick = async () => {
   try { await post('/api/draft', { config: sanitizeConfig(cfg), slot }); dirty = false; sfx.levelup(); location.href = '/editor'; }
   catch (err) { sfx.error(); toast('Could not save: ' + err.message, true); btn.disabled = false; btn.textContent = 'Save to my card'; }
 };
+// publish + post the card to the server's cards channel (same as the editor's Post to Discord button)
+$('#postdc').onclick = async () => {
+  if (!me.canPost) { sfx.error(); return toast('Posting to Discord is not set up yet. Download the PNG and upload it in the server for now.', true); }
+  const btn = $('#postdc'); btn.disabled = true; btn.textContent = 'Posting...';
+  try {
+    const j = await post('/api/publish', { config: sanitizeConfig(cfg), slot, post: true }); dirty = false;
+    if (j.posted === 'ok') { sfx.levelup(); toast('Posted to Discord!'); }
+    else if (j.posted === 'slow_down') { sfx.error(); toast('Saved and published, but you can post once every 5 minutes.', true); }
+    else { sfx.error(); toast('Published, but the Discord post failed. Try again.', true); }
+  } catch (err) {
+    sfx.error(); const m = { not_in_server: 'Join the server first.', no_rank: 'You need a tier role to post.', stats_unavailable: 'Could not read your roles. Try again soon.' };
+    toast(m[err.code] || 'Could not post: ' + err.message, true);
+  }
+  btn.disabled = false; btn.textContent = 'Post to Discord';
+};
+$('#dl').innerHTML = icon('download') + 'PNG';
+$('#dl').onclick = () => cv.toBlob((b) => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'battlecard.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
 $('#back').onclick = (e) => { if (dirty && !confirm('Leave without saving your layout changes?')) e.preventDefault(); else dirty = false; };
 addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
