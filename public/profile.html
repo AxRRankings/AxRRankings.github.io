@@ -24,7 +24,7 @@ try {
     '<div class="stage"><img src="' + img + '" alt="Battle card of ' + esc(d.name) + '"></div>' +
     '<div class="kpis"><div class="kpi"><span>COMBAT RANK</span><b>' + esc((d.rank && d.rank.name) || '-') + '</b></div><div class="kpi"><span>POINTS</span><b>' + d.points + '</b></div><div class="kpi"><span>RANKED MODES</span><b>' + ranked + '/10</b></div><div class="kpi"><span>BEST TIER</span><b>' + esc(d.best || '-') + '</b></div></div>' +
     '<div class="tiergrid">' + tiers + '</div>' +
-    '<div class="box"><h2>Show it in Discord</h2><p>Type <code>1card</code> for your own card, or <code>1card @' + esc(d.name) + '</code> to show this one.</p><a class="btn primary" href="/editor">Make your own card</a></div>';
+    '<div class="box"><h2>Show it in Discord</h2><p>Type <code>1battlecard</code> for your own card, or <code>1battlecard @' + esc(d.name) + '</code> to show this one.</p><a class="btn primary" href="/editor">Make your own card</a></div>';
   document.getElementById('cp').onclick = async (e) => { try { await navigator.clipboard.writeText(location.origin + img); e.currentTarget.lastChild.textContent = 'Copied!'; } catch {} };
 } catch {
   app.innerHTML = '<div class="box" style="max-width:560px;margin:40px auto;text-align:center"><h2>No card here yet</h2><p>This player has not published a Battle Card, or has no rank.</p><a class="btn primary" href="/editor">Make yours</a></div>';

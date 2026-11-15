@@ -227,20 +227,27 @@ function init() {
   };
 
   // ---------- publish / copy / download ----------
-  $('#publish').onclick = async () => {
-    clearTimeout(saveTimer); saveTimer = 0; setStat('Publishing...', 'busy');
+  $('#postdc').hidden = !me.canPost;
+  const publishCard = async (andPost) => {
+    clearTimeout(saveTimer); saveTimer = 0; setStat(andPost ? 'Posting...' : 'Publishing...', 'busy');
     try {
       slots[cur] = slots[cur] || { config: sanitizeConfig(cfg), at: Date.now() };
-      const j = await post('/api/publish', { config: sanitizeConfig(cfg), slot: cur });
+      const j = await post('/api/publish', { config: sanitizeConfig(cfg), slot: cur, post: !!andPost });
       publishedAt = j.publishedAt; active = cur; dirty = false;
       $('#view').href = j.profileUrl; $('#viewrow').hidden = false;
-      refreshInfo(); sfx.levelup(); toast('Published! Type 1card in Discord.');
+      refreshInfo(); setStat(statFor());
+      if (!andPost) { sfx.levelup(); toast('Published! Type 1battlecard in Discord, or tap Post to Discord.'); }
+      else if (j.posted === 'ok') { sfx.levelup(); toast('Posted to Discord!'); }
+      else if (j.posted === 'slow_down') { sfx.error(); toast('Published, but you can post once every 5 minutes. Try again soon.', true); }
+      else { sfx.error(); toast('Published, but the Discord post failed. Try again.', true); }
     } catch (e) {
       setStat('Publish failed', 'err'); sfx.error();
       const m = { not_in_server: 'Join the server first to publish.', no_rank: 'You need a tier role to publish.', stats_unavailable: 'Could not read your roles. Try again soon.' };
       toast(m[e.code] || 'Publish failed: ' + e.message, true);
     }
   };
+  $('#publish').onclick = () => publishCard(false);
+  $('#postdc').onclick = async () => { const b = $('#postdc'); b.disabled = true; await publishCard(true); b.disabled = false; };
   $('#copy').onclick = async () => {
     const url = `${location.origin}/api/card/${me.user.id}.png`;
     try { await navigator.clipboard.writeText(url); toast(publishedAt ? 'Image link copied' : 'Link copied. Publish first for it to work.'); }
