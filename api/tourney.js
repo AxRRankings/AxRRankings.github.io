@@ -151,16 +151,16 @@ export default async function handler(req, res) {
         if (!r) return reply(res, false, '❌ That player has no open match right now (already advanced, eliminated, or waiting for an opponent).');
         await T.save(t);
         const total = t.rounds.length, win = T.nameOf(t, wid), lose = T.nameOf(t, r.opponent);
-        if (t.status === 'done') { await T.archive(t); return reply(res, true, `🏆 **${win}** beats **${lose}** in the **Final**!\n\n👑 **${win}** ${t.teamSize === 2 ? 'are' : 'is'} the champion of **${t.name}**!\n${link}`); }
+        if (t.status === 'done') { await T.archive(t); return reply(res, true, `🏆 **${win}** beats **${lose}** in the **Final**!\n\n👑 **${win}** ${t.teamSize === 2 ? 'are' : 'is'} the champion of **${t.name}**!\n${T.bracketText(t)}\n${link}`); }
         const nx = t.rounds[r.r + 1][r.j >> 1];
         const next = nx.a && nx.b ? `Next: **${T.nameOf(t, nx.a)}** vs **${T.nameOf(t, nx.b)}** (${T.roundName(r.r + 1, total)})` : `**${win}** now waits in the ${T.roundName(r.r + 1, total)}.`;
-        return reply(res, true, `✅ **${win}** beats **${lose}** in the **${T.roundName(r.r, total)}**.\n${next}`);
+        return reply(res, true, `✅ **${win}** beats **${lose}** in the **${T.roundName(r.r, total)}**.\n${next}\n${T.bracketText(t)}`);
       }
 
       if (action === 'undo') {
         if (t.status !== 'live' && t.status !== 'done') return reply(res, false, '❌ Nothing to undo.');
         const u = T.undoLast(t); if (!u) return reply(res, false, '❌ No results to undo.');
-        await T.save(t); return reply(res, true, `↩️ Undid the last result (${T.roundName(u.r, t.rounds.length)}). Report it again with \`1twin @winner\`.`);
+        await T.save(t); return reply(res, true, `↩️ Undid the last result (${T.roundName(u.r, t.rounds.length)}). Report it again with \`1twin @winner\`.\n${T.bracketText(t)}`);
       }
 
       if (action === 'cancel') {
