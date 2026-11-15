@@ -9,6 +9,7 @@ import * as T from '../lib/tournament.js';
 const reply = (res, ok, msg, extra = {}) => json(res, 200, { ok, msg: String(msg).slice(0, 1800), ...extra });
 const site = (req) => (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/$/, '');
 const goodKey = (a, b) => { const x = Buffer.from(String(a || '')), y = Buffer.from(String(b || '')); return x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y); };
+const cleanName = (v) => String(v || '').replace(/<@!?\d+>|\d{15,22}/, '').replace(/[^\w \-.!'&]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
 const uid = (v) => { const m = String(v || '').match(/\d{15,22}/); return m ? m[0] : null; };
 
 async function publicView(req, res) {
@@ -91,15 +92,25 @@ export default async function handler(req, res) {
             if (T.teamOf(t, pid)) return reply(res, false, '❌ Your partner is already in a team.');
             const a = await lite(user, 'You'), p = await lite(pid, 'Your partner');
             const mem = (m) => ({ id: m.id, name: m.name, avatarUrl: m.avatarUrl });
-            t.entrants.push({ id: a.id, name: `${a.name} & ${p.name}`.slice(0, 60), avatarUrl: a.avatarUrl, points: (a.points || 0) + (p.points || 0), members: [mem(a), mem(p)], joinedAt: Date.now() });
+            const tname = cleanName(text);
+            t.entrants.push({ id: a.id, name: tname || `${a.name} & ${p.name}`.slice(0, 60), avatarUrl: a.avatarUrl, points: (a.points || 0) + (p.points || 0), members: [mem(a), mem(p)], joinedAt: Date.now() });
             await T.save(t);
-            return reply(res, true, `✅ Team **${a.name} & ${p.name}** joined **${t.name}**. Teams: **${t.entrants.length}**`);
+            return reply(res, true, `✅ Team **${tname || `${a.name} & ${p.name}`}**${tname ? ` (${a.name} & ${p.name})` : ''} joined **${t.name}**. Teams: **${t.entrants.length}**`);
           }
           const m = await lite(user, 'You');
           t.entrants.push({ id: m.id, name: m.name, avatarUrl: m.avatarUrl, points: m.points, joinedAt: Date.now() });
           await T.save(t);
           return reply(res, true, `✅ **${m.name}** joined **${t.name}**. Players: **${t.entrants.length}**`);
         } catch (e) { if (e.say) return reply(res, false, e.say); throw e; }
+      }
+
+      if (action === 'rename') {
+        if (t.teamSize !== 2) return reply(res, false, '❌ Team names are only for 2v2 tournaments.');
+        if (t.status !== 'open' && t.status !== 'live') return reply(res, false, '❌ The tournament is over.');
+        const tm = T.teamOf(t, user); if (!tm) return reply(res, false, '❌ You are not in a team.');
+        const nn = cleanName(text); if (!nn) return reply(res, false, '❌ Give a name: `1tteam Team Name` (letters and numbers, up to 24 characters).');
+        tm.name = nn; await T.save(t);
+        return reply(res, true, `✅ Your team is now called **${nn}**.`);
       }
 
       if (action === 'leave') {
