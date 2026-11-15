@@ -61,6 +61,18 @@ export default async function handler(req, res) {
 
       if (!t) return reply(res, false, '❌ There is no tournament. Staff can start one with `1tcreate`.');
 
+      if (action === 'precheck') { // can this pair sign up? (used before the partner is asked to accept)
+        if (t.status !== 'open') return reply(res, false, '❌ Sign-ups are closed.');
+        if (t.teamSize !== 2) return reply(res, false, '❌ This is a solo tournament. Just use `1tjoin`.');
+        const pid = uid(text);
+        if (!user || !pid) return reply(res, false, '❌ Mention your partner: `1tjoin @partner`.');
+        if (pid === user) return reply(res, false, '❌ You cannot team up with yourself.');
+        if (T.teamOf(t, user)) return reply(res, false, '❌ You already joined.');
+        if (T.teamOf(t, pid)) return reply(res, false, '❌ That player is already in a team.');
+        if (t.entrants.length >= (t.max || T.MAX_PLAYERS)) return reply(res, false, '❌ The tournament is full.');
+        return reply(res, true, 'ok');
+      }
+
       if (action === 'join') {
         if (t.status !== 'open') return reply(res, false, '❌ Sign-ups are closed.');
         if (!user) return reply(res, false, '❌ Could not read your user.');
