@@ -423,3 +423,4 @@ input[type=text]:focus { outline: 3px solid #fff; outline-offset: -3px; }
 .ov .blk.sel .lbl { opacity: 1; }
 .ov .blk .hd { position: absolute; right: -9px; bottom: -9px; width: 20px; height: 20px; background: #7cff4f; border: 2px solid #111; cursor: nwse-resize; touch-action: none; display: none; }
 .ov .blk.sel .hd { display: block; }
+.t-duo { display: inline-flex; flex: none; } .t-duo .t-av + .t-av { margin-left: -8px; }

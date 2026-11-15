@@ -18,7 +18,7 @@ import { sfx } from '/js/sfx.js';
 mountChrome(); fillNavUser();
 const body = document.getElementById('body'), modal = document.getElementById('modal');
 let last = '';
-const av = (p) => p && p.avatarUrl ? '<img class="t-av" src="' + esc(p.avatarUrl) + '" alt="">' : '<span class="t-av">' + esc(((p && p.name) || '?')[0].toUpperCase()) + '</span>';
+const av = (p) => p && p.members && p.members.length === 2 ? '<span class="t-duo">' + p.members.map((m) => m.avatarUrl ? '<img class="t-av" src="' + esc(m.avatarUrl) + '" alt="">' : '<span class="t-av">' + esc((m.name || '?')[0].toUpperCase()) + '</span>').join('') + '</span>' : p && p.avatarUrl ? '<img class="t-av" src="' + esc(p.avatarUrl) + '" alt="">' : '<span class="t-av">' + esc(((p && p.name) || '?')[0].toUpperCase()) + '</span>';
 
 function render(t, hist) {
   const key = JSON.stringify([t, hist]); if (key === last) return; last = key;
@@ -31,7 +31,7 @@ function render(t, hist) {
   }
   const P = Object.fromEntries(t.entrants.map((e) => [e.id, e]));
   document.getElementById('tt').textContent = t.name;
-  document.getElementById('ts').textContent = (t.mode === 'ANY' ? 'Any mode' : t.mode) + ' · 1v1 knockout · ' + t.entrants.length + ' player' + (t.entrants.length === 1 ? '' : 's');
+  document.getElementById('ts').textContent = (t.mode === 'ANY' ? 'Any mode' : t.mode) + (t.teamSize === 2 ? ' · 2v2 knockout · ' : ' · 1v1 knockout · ') + t.entrants.length + (t.teamSize === 2 ? ' team' : ' player') + (t.entrants.length === 1 ? '' : 's');
   st.hidden = false; st.className = 't-state ' + t.status; st.textContent = { open: 'SIGN-UPS OPEN', live: 'LIVE', done: 'FINISHED', cancelled: 'CANCELLED' }[t.status];
   let html = '';
   if (t.status === 'done' && P[t.champion]) html += '<div class="champ">' + av(P[t.champion]) + '<div><small>CHAMPION</small><b>' + esc(P[t.champion].name) + '</b></div></div>';
