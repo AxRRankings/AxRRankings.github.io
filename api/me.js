@@ -27,6 +27,6 @@ export default async function handler(req, res) {
     slots, last: meta.last, active: meta.active, names: meta.names || {},
     config: sanitizeConfig(slots[meta.last]?.config || DEFAULT_CONFIG),
     published: pub ? { at: pub.at } : null,
-    canPost: !!process.env.CARDS_WEBHOOK_URL,
+    canPost: !!(process.env.CARDS_WEBHOOK_URL || process.env.CARDS_CHANNEL_ID),
   });
 }

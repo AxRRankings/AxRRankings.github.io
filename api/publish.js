@@ -5,18 +5,21 @@ import { getCardData } from '../lib/discord.js';
 import { sanitizeConfig } from '../public/js/card-core.js';
 import { slotKey, metaKey, emptyMeta, parseSlot } from '../lib/slots.js';
 
-// Post the published card to the server's cards channel through a Discord webhook (CARDS_WEBHOOK_URL).
+// Post the published card to the server's cards channel through a Discord webhook (CARDS_WEBHOOK_URL) or the bot (CARDS_CHANNEL_ID).
 async function postToDiscord(req, user, at) {
-  const hook = process.env.CARDS_WEBHOOK_URL;
-  if (!hook) return 'not_configured';
+  const hook = process.env.CARDS_WEBHOOK_URL, chan = process.env.CARDS_CHANNEL_ID;
+  if (!hook && !chan) return 'not_configured';
   if ((await store.hit(`bc:post:${user.id}`, 300)) > 1) return 'slow_down';   // one post per 5 minutes per player
   const base = baseUrl(req);
   const name = String(user.username || 'Player').slice(0, 32);
   try {
-    const r = await fetch(hook, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(10000),
+    // either a webhook URL, or the site's bot posting into the channel with CARDS_CHANNEL_ID
+    const url = hook || `https://discord.com/api/v10/channels/${encodeURIComponent(chan)}/messages`;
+    const headers = hook ? { 'content-type': 'application/json' } : { 'content-type': 'application/json', authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` };
+    const r = await fetch(url, {
+      method: 'POST', headers, signal: AbortSignal.timeout(10000),
       body: JSON.stringify({
-        username: 'AxR Battle Cards', allowed_mentions: { parse: [] },
+        ...(hook ? { username: 'AxR Battle Cards' } : {}), allowed_mentions: { parse: [] },
         content: `<@${user.id}> posted their Battle Card`,
         embeds: [{ title: `${name}'s Battle Card`, url: `${base}/u/${user.id}`, color: 0x7cff4f, image: { url: `${base}/api/card/${user.id}.png?v=${at}` } }],
       }),
