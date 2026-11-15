@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
+<title>Layout designer - AxR Battle Cards</title>
+</head><body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="loading" id="loading">Loading layout designer</div>
+  <div class="app" id="app" hidden>
+    <div class="stage-col">
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv"></canvas></div>
+        <div class="bar">
+          <span class="state"><i class="dot" id="dot"></i><span id="stat">Drag the green boxes to move them</span></span>
+          <span class="tools">
+            <button class="iconbtn" id="undo" title="Undo" disabled></button>
+            <button class="iconbtn" id="redo" title="Redo" disabled></button>
+          </span>
+        </div>
+        <div class="cta-row">
+          <button class="btn primary" id="save">Save to my card</button>
+          <a class="btn" id="back" href="/editor">Back</a>
+        </div>
+        <p class="hint" id="target" style="padding:8px 2px 0"></p>
+      </div>
+    </div>
+    <div class="panel"><div id="panes" style="padding:4px 0"></div></div>
+  </div>
+</main>
+<footer class="foot" id="footer"></footer>
+<script type="module" src="/js/designer.js"></script>
+</body></html>

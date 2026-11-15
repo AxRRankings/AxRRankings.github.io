@@ -141,7 +141,7 @@ export function presetCustom(name) { return JSON.parse(JSON.stringify(PRESETS[na
 export const PATTERNS = ['none', 'grid', 'dots', 'diagonal', 'scanlines', 'blocks'];
 export const AVATAR_SHAPES = ['circle', 'rounded', 'square', 'diamond'];
 export const BORDER_STYLES = ['none', 'solid', 'neon', 'double', 'dashed', 'corners'];
-export const TIER_STYLES = ['chips', 'blocks', 'list'];
+export const TIER_STYLES = ['chips', 'blocks', 'list', 'pixel', 'glow', 'flat', 'badge', 'split'];
 export const BG_TYPES = ['gradient', 'solid', 'image'];
 export const BANNER_TYPES = ['gradient', 'image', 'none'];
 
@@ -165,7 +165,7 @@ export const DEFAULT_CONFIG = {
   avatar: { source: 'discord', url: '', shape: 'rounded', size: 100, ring: true, glow: 22 },
   banner: { type: 'gradient', image: '', dim: 0.35 },
   border: { style: 'neon', width: 4, radius: 28, glow: 26, color: '' },
-  tiers: { style: 'chips', showEmpty: true, highlightTop: true, modes: MODE_KEYS.slice() },
+  tiers: { style: 'chips', radius: 14, boxH: 120, showEmpty: true, highlightTop: true, modes: MODE_KEYS.slice() },
   stats: { showPoints: true, showRank: true, showRanked: true, showBest: true, showProgress: true, tagline: 'Ready to fight.' },
 };
 
@@ -291,6 +291,8 @@ export function sanitizeConfig(raw) {
     },
     tiers: {
       style: pickEnum(ti.style, TIER_STYLES, D.tiers.style),
+      radius: Math.round(num(ti.radius, 0, 30, D.tiers.radius)),
+      boxH: Math.round(num(ti.boxH, 50, 160, D.tiers.boxH)),
       showEmpty: bool(ti.showEmpty, D.tiers.showEmpty),
       highlightTop: bool(ti.highlightTop, D.tiers.highlightTop),
       modes: modes.length ? modes : D.tiers.modes,
@@ -533,16 +535,17 @@ function tierColor(t) { return t ? TIER_COLORS[t] : '#6B7686'; }
 
 function drawTierCell(ctx, cfg, style, x, y, w, h, mode, tier, top) {
   const c = tierColor(tier);
+  const R = Math.min(cfg.tiers.radius, h / 2);
   ctx.save();
   if (top && cfg.tiers.highlightTop && tier) {
     ctx.save();
     ctx.shadowColor = c; ctx.shadowBlur = 20;
-    rr(ctx, x, y, w, h, style === 'list' ? 10 : style === 'blocks' ? 12 : 14);
+    rr(ctx, x, y, w, h, style === 'pixel' ? 0 : R);
     ctx.fillStyle = '#0B1224'; ctx.fill();
     ctx.restore();
   }
   if (style === 'blocks') {
-    rr(ctx, x, y, w, h, 12);
+    rr(ctx, x, y, w, h, R);
     ctx.fillStyle = tier ? rgba(c, 0.18) : rgba(cfg.colors.panel, 0.55); ctx.fill();
     ctx.shadowBlur = 0;
     ctx.lineWidth = tier ? 2.5 : 1.5; ctx.strokeStyle = tier ? c : 'rgba(255,255,255,0.14)'; ctx.stroke();
@@ -554,7 +557,7 @@ function drawTierCell(ctx, cfg, style, x, y, w, h, mode, tier, top) {
     ctx.fillText(mode, x + w / 2, y + h * 0.78);
     void s;
   } else if (style === 'list') {
-    rr(ctx, x, y, w, h, 10);
+    rr(ctx, x, y, w, h, R);
     ctx.fillStyle = rgba(cfg.colors.panel, Math.min(1, cfg.colors.panelOpacity + 0.1)); ctx.fill();
     ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5; ctx.strokeStyle = tier ? rgba(c, 0.55) : 'rgba(255,255,255,0.1)'; ctx.stroke();
@@ -565,12 +568,49 @@ function drawTierCell(ctx, cfg, style, x, y, w, h, mode, tier, top) {
     ctx.textAlign = 'right'; ctx.fillStyle = c;
     setFont(ctx, cfg, Math.min(24, h * 0.5));
     ctx.fillText(tier || '—', x + w - 16, y + h / 2 + 1);
+  } else if (style === 'pixel') {          // chunky square box with a hard drop shadow
+    const o = Math.max(4, Math.round(h * 0.06)), bw = w - o, bh = h - o;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(x + o, y + o, bw, bh);
+    ctx.fillStyle = tier ? rgba(c, 0.2) : rgba(cfg.colors.panel, 0.75); ctx.fillRect(x, y, bw, bh);
+    ctx.lineWidth = 4; ctx.strokeStyle = tier ? c : '#4a4f58'; ctx.strokeRect(x + 2, y + 2, bw - 4, bh - 4);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = tier ? c : '#6B7686';
+    fitText(ctx, cfg, tier || '-', bw - 16, Math.min(bh * 0.46, 40), 12); ctx.fillText(tier || '-', x + bw / 2, y + bh * 0.4);
+    fitText(ctx, cfg, mode, bw - 14, Math.min(16, bh * 0.2), 8); ctx.fillStyle = cfg.colors.text; ctx.fillText(mode, x + bw / 2, y + bh * 0.78);
+  } else if (style === 'glow') {           // dark box with a glowing neon outline
+    rr(ctx, x, y, w, h, R); ctx.fillStyle = 'rgba(6,10,22,0.82)'; ctx.fill();
+    if (tier) { ctx.shadowColor = c; ctx.shadowBlur = 16; }
+    ctx.lineWidth = 2.5; ctx.strokeStyle = tier ? c : 'rgba(255,255,255,0.16)'; ctx.stroke(); ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = cfg.colors.subtext; fitText(ctx, cfg, mode, w - 16, Math.min(15, h * 0.18), 8); ctx.fillText(mode, x + w / 2, y + h * 0.26);
+    ctx.fillStyle = tier ? c : '#6B7686'; if (tier) { ctx.shadowColor = c; ctx.shadowBlur = 12; }
+    fitText(ctx, cfg, tier || '-', w - 16, Math.min(h * 0.46, 42), 12); ctx.fillText(tier || '-', x + w / 2, y + h * 0.64); ctx.shadowBlur = 0;
+  } else if (style === 'flat') {            // solid colour block, dark text
+    rr(ctx, x, y, w, h, R); ctx.fillStyle = tier ? c : rgba(cfg.colors.panel, 0.7); ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = tier ? 'rgba(8,12,24,0.78)' : cfg.colors.subtext; fitText(ctx, cfg, mode, w - 16, Math.min(15, h * 0.18), 8); ctx.fillText(mode, x + w / 2, y + h * 0.26);
+    ctx.fillStyle = tier ? '#080c18' : '#6B7686'; fitText(ctx, cfg, tier || '-', w - 16, Math.min(h * 0.48, 44), 12); ctx.fillText(tier || '-', x + w / 2, y + h * 0.64);
+  } else if (style === 'badge') {           // round tier badge + mode name
+    rr(ctx, x, y, w, h, R); ctx.fillStyle = rgba(cfg.colors.panel, Math.min(1, cfg.colors.panelOpacity + 0.1)); ctx.fill();
+    ctx.lineWidth = 1.5; ctx.strokeStyle = tier ? rgba(c, 0.5) : 'rgba(255,255,255,0.1)'; ctx.stroke();
+    const r = Math.min(h * 0.36, w * 0.25), cx = x + 14 + r, cy = y + h / 2;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = tier ? c : '#3a4150'; ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = tier ? '#080c18' : '#9aa3b2';
+    fitText(ctx, cfg, tier || '-', r * 1.55, r * 0.9, 8); ctx.fillText(tier || '-', cx, cy + 1);
+    ctx.textAlign = 'left'; ctx.fillStyle = cfg.colors.text; fitText(ctx, cfg, mode, w - (cx - x + r) - 22, Math.min(20, h * 0.3), 8); ctx.fillText(mode, cx + r + 12, cy + 1);
+  } else if (style === 'split') {           // coloured mode tab + tier panel
+    const tw = w * 0.4;
+    rr(ctx, x, y, w, h, R); ctx.fillStyle = rgba(cfg.colors.panel, Math.min(1, cfg.colors.panelOpacity + 0.1)); ctx.fill();
+    ctx.save(); rr(ctx, x, y, w, h, R); ctx.clip(); ctx.fillStyle = tier ? c : '#3a4150'; ctx.fillRect(x, y, tw, h); ctx.restore();
+    ctx.lineWidth = 1.5; rr(ctx, x, y, w, h, R); ctx.strokeStyle = tier ? rgba(c, 0.6) : 'rgba(255,255,255,0.1)'; ctx.stroke();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = tier ? '#080c18' : '#9aa3b2'; fitText(ctx, cfg, mode, tw - 12, Math.min(17, h * 0.26), 7); ctx.fillText(mode, x + tw / 2, y + h / 2 + 1);
+    ctx.fillStyle = tier ? c : '#6B7686'; fitText(ctx, cfg, tier || '-', w - tw - 14, Math.min(h * 0.5, 44), 12); ctx.fillText(tier || '-', x + tw + (w - tw) / 2, y + h / 2 + 1);
   } else { // chips
-    rr(ctx, x, y, w, h, 14);
+    rr(ctx, x, y, w, h, R);
     ctx.fillStyle = rgba(cfg.colors.panel, Math.min(1, cfg.colors.panelOpacity + 0.08)); ctx.fill();
     ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5; ctx.strokeStyle = tier ? rgba(c, 0.6) : 'rgba(255,255,255,0.1)'; ctx.stroke();
-    ctx.save(); rr(ctx, x, y, w, h, 14); ctx.clip();
+    ctx.save(); rr(ctx, x, y, w, h, R); ctx.clip();
     ctx.fillStyle = c; ctx.fillRect(x, y, 7, h); ctx.restore();
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     fitText(ctx, cfg, mode, w - 36, Math.min(17, h * 0.24), 8); ctx.fillStyle = cfg.colors.subtext;
@@ -602,7 +642,7 @@ function drawTierGrid(ctx, cfg, data, x, y, w, h, cols, gap) {
   }
   const rows = Math.ceil(list.length / cols);
   const cw = (w - gap * (cols - 1)) / cols;
-  const ch = Math.min((h - gap * (rows - 1)) / rows, 120);
+  const ch = Math.min((h - gap * (rows - 1)) / rows, cfg.tiers.boxH || 120);
   const totalH = ch * rows + gap * (rows - 1);
   const oy = y + (h - totalH) / 2;
   const best = topSet(list);
