@@ -1,10 +1,12 @@
 // Public leaderboard: GET /api/rankings?mode=ALL|SWORD|AXE|...
 import { json } from '../lib/http.js';
+import templates from '../lib/templates.js';
 import { listRankedMembers } from '../lib/discord.js';
 import { MODE_KEYS, TIER_POINTS } from '../public/js/card-core.js';
 
 export default async function handler(req, res) {
   const q = new URL(req.url, 'http://x').searchParams;
+  if (q.get('tpl')) return templates(req, res);   // /api/templates is rewritten here (function limit)
   const mode = String(q.get('mode') || 'ALL').toUpperCase();
   let all;
   try { all = await listRankedMembers(); }

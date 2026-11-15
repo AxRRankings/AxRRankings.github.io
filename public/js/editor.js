@@ -1,4 +1,4 @@
-import { LAYOUTS, FONTS, PATTERNS, AVATAR_SHAPES, BORDER_STYLES, TIER_STYLES, BG_TYPES, BANNER_TYPES,
+import { BLOCK_KEYS, BLOCK_LABELS, TEXT_BLOCKS, presetCustom, sanitizeCustom, CUSTOM_W, LAYOUTS, FONTS, PATTERNS, AVATAR_SHAPES, BORDER_STYLES, TIER_STYLES, BG_TYPES, BANNER_TYPES,
   THEMES, MODES, DEFAULT_CONFIG, MAX_DATA_URI, sanitizeConfig, cardSize, drawCard, imageSources, buildCardData } from '/js/card-core.js';
 import { loadFonts, loadImage, toast } from '/js/boot.js';
 import { mountChrome, fillNavUser, icon, esc } from '/js/ui.js';
@@ -72,6 +72,7 @@ function init() {
 
   // ---------- rendering ----------
   const cv = $('#cv'); const ctx = cv.getContext('2d');
+  const ov = document.createElement('div'); ov.className = 'ov'; ov.hidden = true; cv.parentElement.appendChild(ov);
   let renderToken = 0;
   async function paint(config, canvas, token) {
     const clean = sanitizeConfig(config);
@@ -155,7 +156,7 @@ function init() {
     if (!skipHist) { clearTimeout(histTimer); histTimer = setTimeout(pushHist, 500); }
     clearTimeout(thumbTimer); thumbTimer = setTimeout(() => thumb(cur), 350);
     clearTimeout(saveTimer); saveTimer = setTimeout(() => saveSlot(cur, slots[cur].config), 900);
-    refreshInfoQuiet();
+    refreshInfoQuiet(); syncOverlay();
   }
   const refreshInfoQuiet = () => { const nm = names[cur] || `Card ${cur + 1}`; $('#hbname').innerHTML = `${esc(nm)}${active === cur ? ' <small>&#9733; shown in Discord</small>' : ''}`; $('#dup').disabled = false; $('#clear').disabled = false; $('#rename').disabled = false; };
   async function saveSlot(n, config) {
@@ -178,7 +179,7 @@ function init() {
     cv.className = 'out-' + dir; await wait(160);
     cur = n;
     cfg = slots[cur] ? clone(slots[cur].config) : sanitizeConfig(clone(DEFAULT_CONFIG));
-    placeSel(true); build(); syncHist(); refreshInfo();
+    placeSel(true); build(); syncHist(); refreshInfo(); syncOverlay();
     await render();
     cv.className = (fresh ? 'pop-in' : 'in-' + dir);
     if (fresh) sfx.pop();
@@ -266,8 +267,72 @@ function init() {
   const modesBlock = raw(() => `<div class="modes">${MODES.map((m) =>
     `<label class="toggle"><span>${m.label}</span><input type="checkbox" data-mode="${m.key}" ${cfg.tiers.modes.includes(m.key) ? 'checked' : ''}><i class="sw"></i></label>`).join('')}</div>`);
 
+  // ---------- layout editor ----------
+  let selBlock = 'avatar', curTab = Number(sessionStorage.getItem('bc_tab') || 0);
+  const isCustom = () => cfg.layout === 'custom';
+  const TEXTUAL = new Set(TEXT_BLOCKS);
+  const startBlock = raw(() => `<div class="seg" data-lay="preset">${['classic', 'split', 'compact', 'showcase'].map((k) => `<button data-v="${k}">${esc(LAYOUTS[k].label)}</button>`).join('')}</div><p class="hint">${isCustom() ? 'Pick one to replace your layout with it.' : 'Pick one to turn it into a layout you can move around. Your colors, font and pictures stay.'}</p>`);
+  const customBlock = raw(() => {
+    if (!isCustom()) return '<p class="hint">Choose a starting point above first.</p>';
+    const b = cfg.custom.blocks[selBlock];
+    const al = TEXTUAL.has(selBlock) ? `<div class="ctl"><div class="lab">Text alignment</div><div class="seg" data-lay="align">${['left', 'center', 'right'].map((a) => `<button data-v="${a}" class="${b.align === a ? 'on' : ''}">${a}</button>`).join('')}</div></div>` : '';
+    const cols = selBlock === 'tiers' ? `<div class="ctl"><div class="lab">Columns</div><div class="seg" data-lay="cols">${[1, 2, 3, 4, 5].map((n) => `<button data-v="${n}" class="${b.cols === n ? 'on' : ''}">${n}</button>`).join('')}</div></div>` : '';
+    return `<p class="hint">Drag the green boxes on the card to move them. Drag the square corner to resize.</p>
+      <div class="ctl"><div class="lab">Selected part</div><div class="seg" data-lay="select">${BLOCK_KEYS.map((k) => `<button data-v="${k}" class="${k === selBlock ? 'on' : ''}">${esc(BLOCK_LABELS[k])}${cfg.custom.blocks[k].on ? '' : ' (off)'}</button>`).join('')}</div></div>
+      <label class="toggle"><span>Show ${esc(BLOCK_LABELS[selBlock])}</span><input type="checkbox" data-tog="custom.blocks.${selBlock}.on" ${b.on ? 'checked' : ''}><i class="sw"></i></label>
+      ${al}${cols}
+      <div class="ctl"><label>Card height<span class="val" data-val="custom.h">${cfg.custom.h}</span></label><input type="range" data-range="custom.h" min="260" max="900" step="10" value="${cfg.custom.h}"></div>
+      <div class="ctl"><button class="btn sm ghost" data-lay="resetblk">Reset this layout</button></div>`;
+  });
+  const shareBlock = raw(() => `<p class="hint">Share your layout so other players can use it. Only the positions are shared, never your colors or pictures.</p>
+    <div class="ctl"><label>Template name</label><input type="text" id="tplname" maxlength="24" placeholder="My layout" ${isCustom() ? '' : 'disabled'}></div>
+    <div class="ctl"><button class="btn sm primary" data-lay="publish" ${isCustom() ? '' : 'disabled'}>Publish as template</button> <a class="btn sm" href="/templates">Browse templates</a></div>`);
+
+  // drag / resize overlay on top of the preview
+  const visH = (k, b) => (k === 'name' ? 108 * b.k : k === 'rank' ? 132 * b.k : k === 'stats' ? 26 * b.k : k === 'progress' ? Math.min(b.h, 30) + 28 : b.h);
+  const visW = (k, b) => (k === 'avatar' ? b.w : b.w);
+  function syncOverlay() {
+    const show = isCustom() && TABS[curTab] && TABS[curTab][0] === 'Layout';
+    ov.hidden = !show; if (!show) { ov.innerHTML = ''; return; }
+    const { height: H } = cardSize(sanitizeConfig(cfg));
+    const bl = cfg.custom.blocks;
+    BLOCK_KEYS.forEach((k) => {
+      let el = ov.querySelector(`[data-k="${k}"]`);
+      if (!bl[k].on) { if (el) el.remove(); return; }
+      if (!el) { el = document.createElement('div'); el.className = 'blk'; el.dataset.k = k; el.innerHTML = `<span class="lbl">${esc(BLOCK_LABELS[k])}</span><i class="hd"></i>`; ov.appendChild(el); }
+      el.classList.toggle('sel', k === selBlock);
+      el.style.left = (bl[k].x / CUSTOM_W * 100) + '%'; el.style.top = (bl[k].y / H * 100) + '%';
+      el.style.width = (visW(k, bl[k]) / CUSTOM_W * 100) + '%'; el.style.height = (visH(k, bl[k]) / H * 100) + '%';
+      el.style.zIndex = k === selBlock ? 5 : 1;
+    });
+  }
+  let drag = null, raf = 0;
+  ov.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest('.blk'); if (!el) return;
+    const k = el.dataset.k; e.preventDefault();
+    if (k !== selBlock) { selBlock = k; build(); }
+    const b = cfg.custom.blocks[k];
+    const rect = cv.getBoundingClientRect();
+    drag = { k, resize: e.target.classList.contains('hd'), sx: e.clientX, sy: e.clientY, scale: CUSTOM_W / rect.width, o: { ...b }, el, id: e.pointerId };
+    el.setPointerCapture(e.pointerId); clearTimeout(histTimer); pushHist(); syncOverlay();
+  });
+  ov.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = (e.clientX - drag.sx) * drag.scale, dy = (e.clientY - drag.sy) * drag.scale;
+    const b = cfg.custom.blocks[drag.k], o = drag.o; const { height: H } = cardSize(sanitizeConfig(cfg));
+    if (!drag.resize) { b.x = Math.round(Math.min(CUSTOM_W - 20, Math.max(-o.w + 20, o.x + dx))); b.y = Math.round(Math.min(H - 10, Math.max(-20, o.y + dy))); }
+    else if (drag.k === 'avatar') { b.w = Math.round(Math.max(40, o.w + Math.max(dx, dy))); b.h = b.w; }
+    else if (TEXTUAL.has(drag.k)) { const f = Math.min(2.2 / o.k, Math.max(0.4 / o.k, (o.w + dx) / o.w)); b.w = Math.round(o.w * f); b.k = Math.round(o.k * f * 100) / 100; }
+    else if (drag.k === 'progress') { b.w = Math.round(Math.max(60, o.w + dx)); b.h = Math.round(Math.min(24, Math.max(6, o.h + dy))); }
+    else { b.w = Math.round(Math.max(40, o.w + dx)); b.h = Math.round(Math.max(30, o.h + dy)); }
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; changed(); });
+  });
+  const endDrag = (e) => { if (drag && e.pointerId === drag.id) { drag = null; if (raf) { cancelAnimationFrame(raf); raf = 0; changed(); } } };
+  ov.addEventListener('pointerup', endDrag); ov.addEventListener('pointercancel', endDrag);
+
   const TABS = [
-    ['Style', 'layout', [['Quick themes', [themesBlock]], ['Layout', [seg('layout', 'Card layout', Object.entries(LAYOUTS).map(([k, v]) => [k, v.label]))]]]],
+    ['Style', 'layout', [['Quick themes', [themesBlock]], ['Layout', [seg('layout', 'Card layout', Object.entries(LAYOUTS).filter(([k]) => k !== 'custom').map(([k, v]) => [k, v.label])), hint('Want to move things around yourself? Open the Layout tab.')]]]],
+    ['Layout', 'layout', [['Start from', [startBlock]], ['Customize', [customBlock]], ['Share', [shareBlock]]]],
     ['Background', 'image', [
       ['Base', [seg('bg.type', 'Type', BG_TYPES.map((t) => [t, t])), colors2([['bg.color1', 'Color 1'], ['bg.color2', 'Color 2']]), range('bg.angle', 'Gradient angle', 0, 360)]],
       ['Pattern', [seg('bg.pattern', 'Pattern', PATTERNS.map((t) => [t, t])), color('bg.patternColor', 'Pattern color'), range('bg.patternOpacity', 'Strength', 0, 0.4, 0.01)]],
@@ -284,7 +349,7 @@ function init() {
   ];
 
   function build() {
-    const active_ = Math.min(Number(sessionStorage.getItem('bc_tab') || 0), TABS.length - 1);
+    const active_ = Math.min(curTab, TABS.length - 1);
     $('#tabs').innerHTML = TABS.map(([n, ic], i) => `<button class="tab ${i === active_ ? 'on' : ''}" data-i="${i}">${icon(ic)}${n}</button>`).join('');
     $('#panes').innerHTML = TABS.map(([, , groups], i) => `<div class="pane ${i === active_ ? 'on' : ''}" data-i="${i}">${groups.map(([t, items]) => `<div class="group"><h4>${t}</h4>${items.map((c) => c.html()).join('')}</div>`).join('')}</div>`).join('');
   }
@@ -293,6 +358,7 @@ function init() {
   $('#tabs').addEventListener('click', (e) => {
     const b = e.target.closest('.tab'); if (!b) return;
     try { sessionStorage.setItem('bc_tab', b.dataset.i); } catch {}
+    curTab = Number(b.dataset.i); syncOverlay();
     document.querySelectorAll('.tab,.pane').forEach((el) => el.classList.toggle('on', el.dataset.i === b.dataset.i));
     b.scrollIntoView({ block: 'nearest', inline: 'center' });
   });
@@ -317,6 +383,23 @@ function init() {
       build(); changed();
     }
   });
+  panes.addEventListener('click', async (e) => {
+    const lb = e.target.closest('[data-lay]'); if (!lb) return;
+    const kind = lb.dataset.lay, v = (e.target.closest('button') || {}).dataset?.v;
+    if (kind === 'preset' && v) { clearTimeout(histTimer); pushHist(); cfg.layout = 'custom'; cfg.custom = presetCustom(v); selBlock = 'avatar'; build(); return changed(); }
+    if (kind === 'select' && v) { selBlock = v; build(); return syncOverlay(); }
+    if (kind === 'align' && v) { cfg.custom.blocks[selBlock].align = v; build(); return changed(); }
+    if (kind === 'cols' && v) { cfg.custom.blocks.tiers.cols = Number(v); build(); return changed(); }
+    if (kind === 'resetblk') { if (!confirm('Reset the layout to Classic?')) return; clearTimeout(histTimer); pushHist(); cfg.custom = presetCustom('classic'); build(); return changed(); }
+    if (kind === 'publish') {
+      const name = ($('#tplname')?.value || '').trim();
+      if (name.length < 2) { sfx.error(); return toast('Give your template a name first.', true); }
+      lb.disabled = true;
+      try { await post('/api/templates', { a: 'publish', name, custom: sanitizeCustom(cfg.custom) }); sfx.levelup(); toast('Template published! Everyone can use it now.'); }
+      catch (err) { sfx.error(); const m = { login_required: 'Log in first.', not_in_server: 'Join the server first.', no_rank: 'You need a tier role to publish templates.', limit: 'You already have 5 templates. Ask staff to remove one.', slow_down: 'Slow down a little.', bad_name: 'Pick a different name.' }; toast(m[err.code] || 'Could not publish: ' + err.message, true); }
+      lb.disabled = false;
+    }
+  });
   panes.addEventListener('input', (e) => {
     const t = e.target;
     if (t.dataset.range) { const v = Number(t.value); set(cfg, t.dataset.range, v); const l = panes.querySelector(`[data-val="${t.dataset.range}"]`); if (l) l.textContent = v; return changed(); }
@@ -331,7 +414,7 @@ function init() {
   });
   panes.addEventListener('change', (e) => {
     const t = e.target;
-    if (t.dataset.tog) { set(cfg, t.dataset.tog, t.checked); return changed(); }
+    if (t.dataset.tog) { set(cfg, t.dataset.tog, t.checked); if (t.dataset.tog.startsWith('custom.')) build(); return changed(); }
     if (t.dataset.mode) { const s = new Set(cfg.tiers.modes); t.checked ? s.add(t.dataset.mode) : s.delete(t.dataset.mode); cfg.tiers.modes = MODES.map((m) => m.key).filter((k) => s.has(k)); return changed(); }
     if (t.dataset.up && t.files[0]) handleUpload(t.dataset.up, t.files[0]).finally(() => { t.value = ''; });
   });
@@ -374,6 +457,20 @@ function init() {
     history.replaceState(null, '', '/editor'); build(); changed(); toast('Style applied to slot ' + (cur + 1));
   }
 
-  refreshInfo(); render(); placeSel(false);
-  applyGallery();
+  async function applyTemplate() {
+    const id = new URLSearchParams(location.search).get('template'); if (!id) return;
+    history.replaceState(null, '', '/editor');
+    let t; try { const j = await (await fetch('/api/templates?id=' + encodeURIComponent(id))).json(); t = (j.templates || [])[0]; } catch {}
+    if (!t) { sfx.error(); return toast('That template was not found.', true); }
+    let target = cur;
+    if (slots[cur]) { const free = slots.findIndex((x) => !x); if (free >= 0) target = free; else if (!confirm(`All slots are used. Replace card ${cur + 1} with this layout?`)) return; }
+    if (target !== cur) await switchTo(target, { fresh: true });
+    cfg.layout = 'custom'; cfg.custom = sanitizeCustom(t.custom); selBlock = 'avatar';
+    try { sessionStorage.setItem('bc_tab', String(TABS.findIndex((x) => x[0] === 'Layout'))); curTab = TABS.findIndex((x) => x[0] === 'Layout'); } catch {}
+    build(); changed(); toast('Layout "' + t.name + '" applied to slot ' + (cur + 1));
+    fetch('/api/templates', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ a: 'use', id }) }).catch(() => {});
+  }
+
+  refreshInfo(); render(); placeSel(false); syncOverlay();
+  applyGallery().then(applyTemplate);
 }

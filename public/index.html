@@ -15,6 +15,7 @@
       <div class="actions">
         <a class="btn discord lg" id="cta" href="/api/auth/login">Login with Discord</a>
         <a class="btn lg" href="/rankings">View rankings</a>
+        <a class="btn lg" href="/updates">Updates</a>
       </div>
       <p class="fine" id="err">Only ranked players can make a card.</p>
     </div>
@@ -56,7 +57,7 @@ fetch('/api/tournament').then((r) => r.json()).then((j) => { const t = j.t; if (
   document.getElementById('tbs').textContent = t.status === 'open' ? 'Sign-ups are open. Type 1tjoin in the server. ' + t.entrants.length + ' joined so far.' : 'Follow the live bracket.';
   document.getElementById('tbanner').hidden = false; }).catch(() => {});
 const tiles = [['diamond', 'Rankings', 'See every ranked player and open their card.', '/rankings'], ['emerald', 'Card editor', 'Design your card with a live preview.', '/editor'], ['gold', 'Gallery', 'Example cards you can start from.', '/gallery'],
-  ['lapis', 'How it works', 'Points, combat ranks and the steps.', '/how-it-works'], ['amethyst', 'FAQ', 'Answers to the usual questions.', '/faq'], ['redstone', 'Bot commands', 'How to post cards in Discord.', '/commands'], ['gold', 'Tournament', 'Live bracket and sign-ups.', '/tournament']];
+  ['lapis', 'How it works', 'Points, combat ranks and the steps.', '/how-it-works'], ['amethyst', 'FAQ', 'Answers to the usual questions.', '/faq'], ['redstone', 'Bot commands', 'How to post cards in Discord.', '/commands'], ['emerald', 'Templates', 'Layouts made by players. Use one on your card.', '/templates'], ['lapis', 'Updates', 'See what is new on the site.', '/updates'], ['gold', 'Tournament', 'Live bracket and sign-ups.', '/tournament']];
 document.getElementById('tiles').innerHTML = tiles.map(([g, t, d, h]) => '<a class="tile" href="' + h + '"><div class="gslot inset">' + gem(g, 40) + '</div><div><h3>' + t + '</h3><p>' + d + '</p></div></a>').join('');
 await loadFonts();
 const T = { SWORD: 'HT2', AXE: 'LT3', UHC: 'HT3', DPOT: 'LT2', NPOT: 'HT4', SMP: 'LT4', SMACE: 'HT1', EMACE: 'LT3', DSMP: 'HT3', CRYSTAL: 'LT2' };

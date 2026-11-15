@@ -85,6 +85,18 @@ export const FONTS = {
   audiowide: { label: 'Audiowide',      family: 'BC Audiowide',     file: 'Audiowide.ttf',       scale: 0.9  },
   chakra:    { label: 'Chakra Petch',   family: 'BC Chakra Petch',  file: 'ChakraPetchBold.ttf', scale: 1.0  },
   mono:      { label: 'Share Tech Mono',family: 'BC Share Tech',    file: 'ShareTechMono.ttf',   scale: 1.05 },
+  bungee:    { label: 'Bungee',         family: 'BC Bungee',        file: 'Bungee-Regular.ttf',  scale: 0.85 },
+  bangers:   { label: 'Bangers',        family: 'BC Bangers',       file: 'Bangers-Regular.ttf', scale: 1.1  },
+  blackops:  { label: 'Black Ops One',  family: 'BC Black Ops',     file: 'BlackOpsOne-Regular.ttf', scale: 0.9 },
+  bebas:     { label: 'Bebas Neue',     family: 'BC Bebas Neue',    file: 'BebasNeue-Regular.ttf', scale: 1.2 },
+  anton:     { label: 'Anton',          family: 'BC Anton',         file: 'Anton-Regular.ttf',   scale: 1.0  },
+  monoton:   { label: 'Monoton',        family: 'BC Monoton',       file: 'Monoton-Regular.ttf', scale: 0.8  },
+  metal:     { label: 'Metal Mania',    family: 'BC Metal Mania',   file: 'MetalMania-Regular.ttf', scale: 1.0 },
+  creepster: { label: 'Creepster',      family: 'BC Creepster',     file: 'Creepster-Regular.ttf', scale: 1.1 },
+  pirata:    { label: 'Pirata One',     family: 'BC Pirata One',    file: 'PirataOne-Regular.ttf', scale: 1.2 },
+  michroma:  { label: 'Michroma',       family: 'BC Michroma',      file: 'Michroma-Regular.ttf', scale: 0.8 },
+  blackout:  { label: 'Blackout Midnight', family: 'BC Blackout', file: 'BlackoutMidnight.ttf', scale: 0.9 },
+  glitch:    { label: 'Rubik Glitch',   family: 'BC Rubik Glitch',  file: 'RubikGlitch-Regular.ttf', scale: 0.9 },
 };
 
 export const LAYOUTS = {
@@ -92,7 +104,39 @@ export const LAYOUTS = {
   split:    { label: 'Split',    w: 1000, h: 560 },
   compact:  { label: 'Compact',  w: 1000, h: 310 },
   showcase: { label: 'Showcase', w: 1000, h: 640 },
+  custom:   { label: 'Custom',   w: 1000, h: 620 },
 };
+
+// ----------------------------------------------------------------------------
+//  Custom layouts: every part of the card is a "block" with a position and size.
+//  The four built-in layouts are also available as starting points.
+// ----------------------------------------------------------------------------
+export const BLOCK_KEYS = ['panel', 'banner', 'tiers', 'progress', 'stats', 'name', 'rank', 'avatar'];
+export const BLOCK_LABELS = { panel: 'Panel', banner: 'Banner', tiers: 'Tiers', progress: 'Progress bar', stats: 'Stats line', name: 'Name', rank: 'Rank and points', avatar: 'Avatar' };
+export const TEXT_BLOCKS = ['name', 'rank', 'stats'];
+export const CUSTOM_W = 1000;
+const OFFB = (x = 0, y = 0, w = 100, h = 100, o = {}) => ({ on: false, x, y, w, h, k: 1, align: 'left', cols: 5, ...o });
+const ONB = (x, y, w, h, o = {}) => ({ ...OFFB(x, y, w, h, o), on: true });
+export const PRESETS = {
+  classic: { h: 620, blocks: {
+    panel: OFFB(28, 28, 344, 564), banner: ONB(0, 0, 1000, 190), avatar: ONB(48, 108, 150, 150),
+    name: ONB(226, 196, 424, 100), stats: ONB(226, 334, 424, 26), rank: ONB(652, 204, 300, 132, { align: 'right' }),
+    progress: ONB(652, 338, 300, 10), tiers: ONB(40, 380, 920, 204) } },
+  split: { h: 560, blocks: {
+    panel: ONB(28, 28, 340, 504), banner: ONB(28, 28, 340, 150), avatar: ONB(133, 78, 130, 130),
+    name: ONB(48, 208, 300, 100, { align: 'center', k: 0.8 }), stats: ONB(28, 496, 340, 26, { align: 'center', k: 0.8 }),
+    rank: ONB(28, 302, 340, 132, { align: 'center', k: 0.9 }), progress: ONB(56, 446, 284, 12),
+    tiers: ONB(392, 28, 580, 504, { cols: 2 }) } },
+  compact: { h: 310, blocks: {
+    panel: OFFB(28, 28, 460, 254), banner: OFFB(0, 0, 1000, 120), avatar: ONB(36, 77, 120, 120),
+    name: ONB(180, 36, 330, 100, { k: 0.85 }), stats: OFFB(180, 230, 330, 26, { k: 0.8 }),
+    rank: ONB(180, 136, 320, 132, { k: 0.75 }), progress: ONB(36, 258, 444, 10), tiers: ONB(530, 26, 444, 258, { cols: 3 }) } },
+  showcase: { h: 720, blocks: {
+    panel: OFFB(28, 28, 944, 664), banner: ONB(0, 0, 1000, 210), avatar: ONB(420, 114, 160, 160),
+    name: ONB(80, 272, 840, 100, { align: 'center' }), rank: ONB(80, 384, 840, 132, { align: 'center', k: 0.8 }),
+    progress: ONB(280, 494, 440, 10), stats: ONB(80, 538, 840, 26, { align: 'center', k: 0.9 }), tiers: ONB(40, 574, 920, 128) } },
+};
+export function presetCustom(name) { return JSON.parse(JSON.stringify(PRESETS[name] || PRESETS.classic)); }
 
 export const PATTERNS = ['none', 'grid', 'dots', 'diagonal', 'scanlines', 'blocks'];
 export const AVATAR_SHAPES = ['circle', 'rounded', 'square', 'diamond'];
@@ -107,6 +151,7 @@ export const BANNER_TYPES = ['gradient', 'image', 'none'];
 export const DEFAULT_CONFIG = {
   v: 1,
   layout: 'classic',
+  custom: presetCustom('classic'),
   font: 'orbitron',
   bg: {
     type: 'gradient', color1: '#0A0F1E', color2: '#150A2E', angle: 135,
@@ -179,6 +224,27 @@ function imageRef(v) {
   return '';
 }
 
+export function sanitizeCustom(raw) {
+  const r = raw && typeof raw === 'object' ? raw : {};
+  const base = PRESETS.classic;
+  const rb = r.blocks && typeof r.blocks === 'object' ? r.blocks : {};
+  const blocks = {};
+  for (const key of BLOCK_KEYS) {
+    const d = base.blocks[key];
+    const b = rb[key] && typeof rb[key] === 'object' ? rb[key] : {};
+    blocks[key] = {
+      on: bool(b.on, d.on),
+      x: Math.round(num(b.x, -100, 1000, d.x)), y: Math.round(num(b.y, -100, 900, d.y)),
+      w: Math.round(num(b.w, 10, 1200, d.w)), h: Math.round(num(b.h, 4, 1000, d.h)),
+      k: Math.round(num(b.k, 0.4, 2.2, d.k) * 100) / 100,
+      align: pickEnum(b.align, ['left', 'center', 'right'], d.align),
+      cols: Math.round(num(b.cols, 1, 5, d.cols)),
+    };
+  }
+  blocks.avatar.h = blocks.avatar.w;
+  return { h: Math.round(num(r.h, 260, 900, base.h)), blocks };
+}
+
 export function sanitizeConfig(raw) {
   const r = raw && typeof raw === 'object' ? raw : {};
   const D = DEFAULT_CONFIG;
@@ -189,6 +255,7 @@ export function sanitizeConfig(raw) {
   return {
     v: 1,
     layout: pickEnum(r.layout, Object.keys(LAYOUTS), D.layout),
+    custom: sanitizeCustom(r.custom),
     font: pickEnum(r.font, Object.keys(FONTS), D.font),
     bg: {
       type: pickEnum(bg.type, BG_TYPES, D.bg.type),
@@ -238,6 +305,7 @@ export function sanitizeConfig(raw) {
 }
 
 export function cardSize(cfg) {
+  if (cfg.layout === 'custom') return { width: CUSTOM_W, height: cfg.custom && cfg.custom.h ? cfg.custom.h : 620 };
   const l = LAYOUTS[cfg.layout] || LAYOUTS.classic;
   return { width: l.w, height: l.h };
 }
@@ -694,6 +762,26 @@ function layoutShowcase(ctx, cfg, data, imgs, W, H) {
   drawTierGrid(ctx, cfg, data, 40, yy + 4, W - 80, H - yy - 32, 5, 14);
 }
 
+function layoutCustom(ctx, cfg, data, imgs, W, H) {
+  const b = cfg.custom.blocks;
+  const anchor = (k) => (k.align === 'center' ? k.w / k.k / 2 : k.align === 'right' ? k.w / k.k : 0);
+  if (b.panel.on) panel(ctx, cfg, b.panel.x, b.panel.y, b.panel.w, b.panel.h, 22);
+  if (b.banner.on && cfg.banner.type !== 'none') {
+    const k = b.banner; ctx.save();
+    if (k.x > 0 || k.w < W - 1) { rr(ctx, k.x, k.y, k.w, k.h, Math.min(22, k.h / 2)); ctx.clip(); }
+    drawBanner(ctx, cfg, k.x, k.y, k.w, k.h, imgs); ctx.restore();
+  }
+  if (b.tiers.on) drawTierGrid(ctx, cfg, data, b.tiers.x, b.tiers.y, b.tiers.w, b.tiers.h, b.tiers.cols, 12);
+  if (b.progress.on && cfg.stats.showProgress) progressBar(ctx, cfg, data, b.progress.x, b.progress.y, b.progress.w, Math.min(b.progress.h, 30));
+  if (b.stats.on) {
+    const k = b.stats, sl = statLine(cfg, data);
+    if (sl) { ctx.save(); ctx.translate(k.x, k.y); ctx.scale(k.k, k.k); setFont(ctx, cfg, 17); ctx.fillStyle = cfg.colors.subtext; ctx.textAlign = k.align; ctx.textBaseline = 'top'; ctx.fillText(ellipsize(ctx, sl, k.w / k.k), anchor(k), 0); ctx.restore(); }
+  }
+  if (b.name.on) { const k = b.name; ctx.save(); ctx.translate(k.x, k.y); ctx.scale(k.k, k.k); drawNameBlock(ctx, cfg, data, anchor(k), 46, k.w / k.k, k.align); ctx.restore(); }
+  if (b.rank.on) { const k = b.rank; ctx.save(); ctx.translate(k.x, k.y); ctx.scale(k.k, k.k); drawRankBlock(ctx, cfg, data, anchor(k), 0, k.align); ctx.restore(); }
+  if (b.avatar.on) drawAvatar(ctx, cfg, data, imgs, b.avatar.x, b.avatar.y, b.avatar.w);
+}
+
 // ----------------------------------------------------------------------------
 //  Border
 // ----------------------------------------------------------------------------
@@ -749,7 +837,7 @@ export function drawCard(ctx, rawCfg, data, imgs = {}) {
   ctx.clip();
   ctx.textBaseline = 'alphabetic';
   drawBackground(ctx, cfg, W, H, imgs);
-  const fn = { classic: layoutClassic, split: layoutSplit, compact: layoutCompact, showcase: layoutShowcase }[cfg.layout];
+  const fn = { classic: layoutClassic, split: layoutSplit, compact: layoutCompact, showcase: layoutShowcase, custom: layoutCustom }[cfg.layout];
   fn(ctx, cfg, data, imgs, W, H);
   ctx.restore();
   drawBorder(ctx, cfg, W, H);

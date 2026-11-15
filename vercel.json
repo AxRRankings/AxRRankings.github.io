@@ -8,6 +8,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/templates",
+      "destination": "/api/rankings?tpl=1"
+    },
+    {
       "source": "/api/tournament",
       "destination": "/api/tourney"
     },

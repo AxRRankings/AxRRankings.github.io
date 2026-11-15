@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d1e22"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/site.css">
+<title>Updates - AxR Battle Cards</title>
+<meta name="description" content="What's new on AxR Battle Cards.">
+<style>
+.upd{display:grid;gap:18px;margin-top:8px}
+.upd article{background:var(--panel,#26272c);border:2px solid #111;box-shadow:inset 2px 2px 0 rgba(255,255,255,.06),inset -2px -2px 0 rgba(0,0,0,.35);padding:20px 20px 8px}
+.upd .tag{display:inline-block;font-family:var(--pixel,inherit);font-size:9px;text-transform:uppercase;padding:6px 8px;background:#46a02c;color:#0b1a06;margin-bottom:10px}
+.upd .tag.old{background:#55565c;color:#ddd}
+.upd h2{margin:0 0 6px;font-size:22px}
+.upd .date{color:var(--muted,#9aa0a6);font-size:13px;margin:0 0 12px}
+.upd ul{margin:0 0 14px;padding-left:20px;line-height:1.6}
+.upd li{margin:4px 0}
+.upd a.btn{margin:0 8px 14px 0}
+</style>
+</head><body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="page-head"><div class="crumb"><a href="/">HOME</a> / UPDATES</div><h1>Updates</h1><p>What's new on AxR Battle Cards.</p></div>
+  <div class="upd">
+    <article>
+      <span class="tag">New</span>
+      <h2>Custom layouts and templates</h2>
+      <p class="date">November 2026</p>
+      <ul>
+        <li><b>Layout editor.</b> In the editor, open the new <b>Layout</b> tab, pick a starting point, then drag and resize every part of your card: avatar, name, rank, points, progress bar and tiers.</li>
+        <li><b>Share your layout.</b> Publish it as a template so everyone can use it. Templates only carry the layout, so each player keeps their own colors, background and pictures.</li>
+        <li><b>Templates page.</b> Browse layouts made by other players and apply one with a single tap.</li>
+        <li><b>12 new fonts.</b> Bungee, Bangers, Black Ops One, Bebas Neue, Anton, Monoton, Metal Mania, Creepster, Pirata One, Michroma, Rubik Glitch and Blackout Midnight.</li>
+        <li><b>Updates page.</b> You are here. New changes will show up at the top.</li>
+      </ul>
+      <a class="btn primary" href="/templates">Browse templates</a><a class="btn" href="/editor">Open the editor</a>
+    </article>
+    <article>
+      <span class="tag old">Earlier</span>
+      <h2>Tournaments and DSMP</h2>
+      <p class="date">Earlier this month</p>
+      <ul>
+        <li><b>Tournaments.</b> Single-elimination 1v1 brackets seeded by combat points, with a live bracket page. Join with <code>1tjoin</code>.</li>
+        <li><b>DSMP mode.</b> DSMP replaced CART everywhere on the site and in the bot.</li>
+      </ul>
+      <a class="btn" href="/tournament">Open the bracket</a>
+    </article>
+  </div>
+</main>
+<footer class="foot" id="footer"></footer>
+<script type="module">import { mountChrome, fillNavUser } from '/js/ui.js'; mountChrome(); fillNavUser();</script></body></html>

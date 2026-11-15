@@ -239,7 +239,7 @@ code, .code { background: var(--slot); border: 2px solid var(--ink); padding: 2p
 .app { display: grid; gap: 18px; padding: 18px 0 40px; grid-template-columns: minmax(0, 1fr); }
 .stage-col { position: sticky; top: 68px; z-index: 30; align-self: start; margin: 0 -16px; padding: 8px 16px; background: linear-gradient(var(--bg) 85%, transparent); }
 .stage { padding: 10px; background: var(--panel); border: 4px solid var(--ink); box-shadow: inset 3px 3px 0 var(--panel-hi), inset -3px -3px 0 var(--panel-lo), 8px 8px 0 rgba(0, 0, 0, .4); }
-.canvas-wrap { border: 3px solid var(--ink); background: conic-gradient(#25262b 25%, #1c1d21 0 50%, #25262b 0 75%, #1c1d21 0) 0 0 / 20px 20px; perspective: 1200px; overflow: hidden; }
+.canvas-wrap { position: relative; border: 3px solid var(--ink); background: conic-gradient(#25262b 25%, #1c1d21 0 50%, #25262b 0 75%, #1c1d21 0) 0 0 / 20px 20px; perspective: 1200px; overflow: hidden; }
 .canvas-wrap canvas { width: 100%; height: auto; display: block; transform-origin: 50% 60%; }
 .canvas-wrap canvas.out-l { animation: outL .16s steps(4) forwards; } .canvas-wrap canvas.out-r { animation: outR .16s steps(4) forwards; }
 .canvas-wrap canvas.in-l { animation: inL .3s steps(7); } .canvas-wrap canvas.in-r { animation: inR .3s steps(7); }
@@ -414,3 +414,12 @@ input[type=text]:focus { outline: 3px solid #fff; outline-offset: -3px; }
 .t-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; margin-top: 28px; background: #3a3320; border: 4px solid var(--ink); box-shadow: inset 3px 3px 0 #6f5e2b, inset -3px -3px 0 #251f10; }
 .t-banner b { font-family: var(--pixel); font-weight: 400; font-size: 11px; color: var(--gold); text-shadow: 2px 2px 0 #000; line-height: 1.6; }
 .t-banner span { display: block; color: #d9ceb0; font-size: 14px; margin-top: 6px; }
+
+/* layout editor overlay */
+.ov { position: absolute; inset: 0; z-index: 3; }
+.ov .blk { position: absolute; border: 2px dashed rgba(255,255,255,.55); background: rgba(70,160,44,.14); cursor: move; touch-action: none; box-sizing: border-box; }
+.ov .blk.sel { border: 2px solid #7cff4f; background: rgba(124,255,79,.2); }
+.ov .blk .lbl { position: absolute; left: 0; top: 0; transform: translateY(-100%); font-family: var(--pixel); font-size: 7px; color: #0b1a06; background: #7cff4f; padding: 3px 5px; white-space: nowrap; opacity: 0; pointer-events: none; }
+.ov .blk.sel .lbl { opacity: 1; }
+.ov .blk .hd { position: absolute; right: -9px; bottom: -9px; width: 20px; height: 20px; background: #7cff4f; border: 2px solid #111; cursor: nwse-resize; touch-action: none; display: none; }
+.ov .blk.sel .hd { display: block; }

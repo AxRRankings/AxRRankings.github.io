@@ -27,6 +27,7 @@ function findHandler(p) {
 http.createServer(async (req, res) => {
   try {
     let pathname = new URL(req.url, 'http://x').pathname;
+    if (pathname === '/api/templates') { const u = new URL(req.url, 'http://x'); u.searchParams.set('tpl', '1'); req.url = '/api/rankings' + u.search; pathname = '/api/rankings'; }
     for (const [re, to] of REWRITES) if (re.test(pathname)) { pathname = pathname.replace(re, to); break; }
     if (pathname.startsWith('/api/')) {
       const h = findHandler(pathname);
