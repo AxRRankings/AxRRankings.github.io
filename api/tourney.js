@@ -95,12 +95,12 @@ export default async function handler(req, res) {
             const tname = cleanName(text);
             t.entrants.push({ id: a.id, name: tname || `${a.name} & ${p.name}`.slice(0, 60), avatarUrl: a.avatarUrl, points: (a.points || 0) + (p.points || 0), members: [mem(a), mem(p)], joinedAt: Date.now() });
             await T.save(t);
-            return reply(res, true, `✅ Team **${tname || `${a.name} & ${p.name}`}**${tname ? ` (${a.name} & ${p.name})` : ''} joined **${t.name}**. Teams: **${t.entrants.length}**`);
+            return reply(res, true, `✅ Team **${tname || `${a.name} & ${p.name}`}**${tname ? ` (${a.name} & ${p.name})` : ''} joined **${t.name}**. Teams: **${t.entrants.length}**`, { members: [a.id, p.id] });
           }
           const m = await lite(user, 'You');
           t.entrants.push({ id: m.id, name: m.name, avatarUrl: m.avatarUrl, points: m.points, joinedAt: Date.now() });
           await T.save(t);
-          return reply(res, true, `✅ **${m.name}** joined **${t.name}**. Players: **${t.entrants.length}**`);
+          return reply(res, true, `✅ **${m.name}** joined **${t.name}**. Players: **${t.entrants.length}**`, { members: [m.id] });
         } catch (e) { if (e.say) return reply(res, false, e.say); throw e; }
       }
 
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         const tm = T.teamOf(t, user);
         if (!tm) return reply(res, false, '❌ You are not signed up.');
         t.entrants = t.entrants.filter((e) => e.id !== tm.id);
-        await T.save(t); return reply(res, true, `✅ You left **${t.name}**.${t.teamSize === 2 ? ' Your team was removed.' : ''} ${t.teamSize === 2 ? 'Teams' : 'Players'}: **${t.entrants.length}**`);
+        await T.save(t); return reply(res, true, `✅ You left **${t.name}**.${t.teamSize === 2 ? ' Your team was removed.' : ''} ${t.teamSize === 2 ? 'Teams' : 'Players'}: **${t.entrants.length}**`, { members: (tm.members || [{ id: tm.id }]).map((m) => m.id) });
       }
 
       if (action === 'kick') {
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
         const tm = T.teamOf(t, user);
         if (!tm) return reply(res, false, '❌ That player is not signed up.');
         t.entrants = t.entrants.filter((e) => e.id !== tm.id);
-        await T.save(t); return reply(res, true, `✅ Removed${t.teamSize === 2 ? ' (whole team)' : ''}. ${t.teamSize === 2 ? 'Teams' : 'Players'}: **${t.entrants.length}**`);
+        await T.save(t); return reply(res, true, `✅ Removed${t.teamSize === 2 ? ' (whole team)' : ''}. ${t.teamSize === 2 ? 'Teams' : 'Players'}: **${t.entrants.length}**`, { members: (tm.members || [{ id: tm.id }]).map((m) => m.id) });
       }
 
       if (action === 'start') {
