@@ -5,6 +5,7 @@ import { json, readJson } from '../lib/http.js';
 import { limited } from '../lib/guard.js';
 import { getMemberLite } from '../lib/discord.js';
 import * as T from '../lib/tournament.js';
+import { renderBracketPng } from '../lib/bracketimg.js';
 
 const reply = (res, ok, msg, extra = {}) => json(res, 200, { ok, msg: String(msg).slice(0, 1800), ...extra });
 const site = (req) => (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/$/, '');
@@ -12,7 +13,17 @@ const goodKey = (a, b) => { const x = Buffer.from(String(a || '')), y = Buffer.f
 const cleanName = (v) => String(v || '').replace(/<@!?\d+>|\d{15,22}/, '').replace(/[^\w \-.!'&]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
 const uid = (v) => { const m = String(v || '').match(/\d{15,22}/); return m ? m[0] : null; };
 
+async function bracketPng(req, res) {
+  const t = await T.load();
+  if (!t || !t.rounds || !t.rounds.length) return json(res, 404, { error: 'no_bracket' });
+  try {
+    const buf = await renderBracketPng(t);
+    res.statusCode = 200; res.setHeader('content-type', 'image/png'); res.setHeader('cache-control', 'public, s-maxage=5, stale-while-revalidate=10'); res.end(buf);
+  } catch (e) { console.error('bracket png', e.message); json(res, 500, { error: 'render_failed' }); }
+}
+
 async function publicView(req, res) {
+  if (new URL(req.url, 'http://x').searchParams.get('img')) return bracketPng(req, res);
   const t = await T.load();
   const hist = await T.history();
   if (!t) return json(res, 200, { t: null, history: hist }, { 'cache-control': 'public, s-maxage=5, stale-while-revalidate=20' });
@@ -151,16 +162,16 @@ export default async function handler(req, res) {
         if (!r) return reply(res, false, '❌ That player has no open match right now (already advanced, eliminated, or waiting for an opponent).');
         await T.save(t);
         const total = t.rounds.length, win = T.nameOf(t, wid), lose = T.nameOf(t, r.opponent);
-        if (t.status === 'done') { await T.archive(t); return reply(res, true, `🏆 **${win}** beats **${lose}** in the **Final**!\n\n👑 **${win}** ${t.teamSize === 2 ? 'are' : 'is'} the champion of **${t.name}**!\n${T.bracketText(t)}\n${link}`); }
+        if (t.status === 'done') { await T.archive(t); return reply(res, true, `🏆 **${win}** beats **${lose}** in the **Final**!\n\n👑 **${win}** ${t.teamSize === 2 ? 'are' : 'is'} the champion of **${t.name}**!\n${link}`, { bracket: T.bracketText(t) }); }
         const nx = t.rounds[r.r + 1][r.j >> 1];
         const next = nx.a && nx.b ? `Next: **${T.nameOf(t, nx.a)}** vs **${T.nameOf(t, nx.b)}** (${T.roundName(r.r + 1, total)})` : `**${win}** now waits in the ${T.roundName(r.r + 1, total)}.`;
-        return reply(res, true, `✅ **${win}** beats **${lose}** in the **${T.roundName(r.r, total)}**.\n${next}\n${T.bracketText(t)}`);
+        return reply(res, true, `✅ **${win}** beats **${lose}** in the **${T.roundName(r.r, total)}**.\n${next}`, { bracket: T.bracketText(t) });
       }
 
       if (action === 'undo') {
         if (t.status !== 'live' && t.status !== 'done') return reply(res, false, '❌ Nothing to undo.');
         const u = T.undoLast(t); if (!u) return reply(res, false, '❌ No results to undo.');
-        await T.save(t); return reply(res, true, `↩️ Undid the last result (${T.roundName(u.r, t.rounds.length)}). Report it again with \`1twin @winner\`.\n${T.bracketText(t)}`);
+        await T.save(t); return reply(res, true, `↩️ Undid the last result (${T.roundName(u.r, t.rounds.length)}). Report it again with \`1twin @winner\`.`, { bracket: T.bracketText(t) });
       }
 
       if (action === 'cancel') {
